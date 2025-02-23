@@ -5,18 +5,18 @@ import {
   OnChanges,
   Output,
   EventEmitter,
+  ViewChild,
 } from "@angular/core";
-import { WidgetService } from "src/app/service/widget.service";
 import { ToastrService } from "ngx-toastr";
 import { DataService } from "src/app/service/data.service";
 import { CommonFunction } from "src/app/service/common-function.service";
-import { LayoutRequest, WidgetBackgroundSetting } from "../../util/static-data";
 import { LocalStorageService } from "angular-web-storage";
-import { WidgetsUtil } from "src/app/util/widgetsUtil";
 import * as moment_t from "moment-timezone";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { ClockService } from "src/app/service/clock.service";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
 
 @Component({
   selector: "app-clock-setting",
@@ -24,6 +24,9 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
   styleUrls: ["./clock-setting.component.scss"],
 })
 export class ClockSettingComponent implements OnInit, OnChanges {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() clockSettingModal: any;
   @Input() category: string;
   @Input() activeLayout: any;
@@ -40,7 +43,6 @@ export class ClockSettingComponent implements OnInit, OnChanges {
   activeMirrorDetails: any;
   settingDisplayflag: any;
   clock24hrFormat: boolean = false;
-  widget: any;
   defaultClockWidget: void;
 
   //background widget setting
@@ -63,7 +65,8 @@ export class ClockSettingComponent implements OnInit, OnChanges {
     private commonFunction: CommonFunction,
     private storage: LocalStorageService,
     private _clockService: ClockService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private widgetDataService: WidgetDataService
   ) {
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
     this.clockFormGroup = this.formBuilder.group({
@@ -77,7 +80,7 @@ export class ClockSettingComponent implements OnInit, OnChanges {
 
   ngOnInit() {}
 
-  createClockForm(clockWidget: any) {
+  createClockForm(clockWidget: any): void {
     this.clockFormGroup = this.formBuilder.group({
       timeZoneId: [
         clockWidget
@@ -90,9 +93,15 @@ export class ClockSettingComponent implements OnInit, OnChanges {
         Validators.requiredTrue,
       ],
     });
+
+    this.widgetDataService.widgetFormState[
+      this.category
+    ].settings.initialValue = {
+      ...this.clockFormGroup.value,
+    };
   }
 
-  ngOnChanges(changes: any) {
+  ngOnChanges(changes: any): void {
     if (
       changes.changeDetector != null &&
       changes.changeDetector.currentValue != undefined
@@ -121,12 +130,12 @@ export class ClockSettingComponent implements OnInit, OnChanges {
     }
   }
 
-  initializeClockData(clockWidget) {
+  initializeClockData(clockWidget): void {
     this.clockWidgetData = clockWidget.data.clockWidgetDetail;
     this.createClockForm(this.clockWidgetData);
   }
 
-  mapCurrentlySelectedTimezone(timeZoneId) {
+  mapCurrentlySelectedTimezone(timeZoneId): void {
     this.currentTimezone = timeZoneId;
     let date = new Date();
     let dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -145,23 +154,66 @@ export class ClockSettingComponent implements OnInit, OnChanges {
       dateFormatter.format(date) + ", " + timeFormatter.format(date);
   }
 
-  setBackgroundWidgetDetail() {
+  setBackgroundWidgetDetail(): void {
     this.widgetType = this.category;
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting,
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
 
-  onbgsettingOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  dismissModel(): void {
+    this.clockSettingModal.hide();
   }
 
-  onAddBackgroundSetting() {
+  selectTimezone(): void {
+    this.mapCurrentlySelectedTimezone(this.clockFormGroup.value.timeZoneId);
+  }
+
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      this.clockFormGroup.value
+    );
+
+    if (isSettingsFormChanged) {
+      this.saveClockSettings();
+      settingsForm.initialValue = this.clockFormGroup.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    this.clockSettingModal.hide();
+  }
+
+  saveBackgroundSettings(event): void {
+    this.newBgSetting = event;
     const payload = {
-      userMirrorId: this.activeMirrorDetails.id,
+      userMirrorId: this.activeMirrorDetails.mirror.id,
       mastercategory: [this.clockWidgetObject.widgetMasterCategory],
       widgetBackgroundSettingModel: this.newBgSetting,
     };
@@ -169,15 +221,7 @@ export class ClockSettingComponent implements OnInit, OnChanges {
     this.clockSettingModal.hide();
   }
 
-  dismissModel() {
-    this.clockSettingModal.hide();
-  }
-
-  selectTimezone() {
-    this.mapCurrentlySelectedTimezone(this.clockFormGroup.value.timeZoneId);
-  }
-
-  saveClockSettings() {
+  saveClockSettings(): void {
     let payload = this.clockFormGroup.value;
     payload["id"] = this.clockWidgetData.id;
     payload["widgetSetting"] = {

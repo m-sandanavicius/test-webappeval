@@ -103,9 +103,7 @@
                 >
                   CANCEL
                 </button>
-                <button class="btn btn-primary" (click)="saveClockSettings()">
-                  SAVE
-                </button>
+                <button class="btn btn-primary" (click)="save()">SAVE</button>
               </div>
             </div>
           </div>
@@ -118,7 +116,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingOptions)="onbgsettingOptions($event)"
+              (emitbgsettingOptions)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>
