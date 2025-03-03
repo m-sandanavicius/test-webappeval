@@ -1,18 +1,44 @@
 import { Injectable } from "@angular/core";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class WidgetDataService {
   widgetFormState = {
     clock: {
       settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
+    },
+    weather: {
+      settings: {
         initialValue: {},
+        currentValue: {}
       },
       format: {
         initialValue: {},
-      },
+        currentValue: {}
+      }
     },
+    quotes: {
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
+    },
+    news: {
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
+    }
   };
 
   isFormValueChanged(initialFormValue: any, currentFormValue: any): boolean {

@@ -1,37 +1,28 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnChanges,
-  Output,
-  EventEmitter,
-} from "@angular/core";
+import { Component, OnInit, Input, OnChanges, ViewChild } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { DataService } from "src/app/service/data.service";
-import { WidgetService } from "src/app/service/widget.service";
 import { CommonFunction } from "src/app/service/common-function.service";
-import {
-  LayoutRequest,
-  WidgetBackgroundSetting,
-} from "src/app/util/static-data";
 import { LocalStorageService } from "angular-web-storage";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { QuotesService } from "src/app/service/quotes.service";
-// import { WidgetBackgroundSetting } from "src/app/util/static-widgetsetting";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
+import { WidgetDataService } from "src/app/service/widget-data.service";
 
 @Component({
   selector: "app-quote-setting",
   templateUrl: "./quotes.component.html",
-  styleUrls: ["./quotes.component.scss"],
+  styleUrls: ["./quotes.component.scss"]
 })
 export class QuotesComponent implements OnInit, OnChanges {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() quoteSettingModal: any;
   @Input() category: string;
   @Input() activeLayout: any;
   @Input() quotesWidgetObject: any;
 
   quotesCategoryList: Array<any>;
-  // quotesLengthList: Array<any>;
   selectedQuotesCategoryList = [5];
   lastSelectedQuotesCategoryList = [];
   selectedQuotesLength = 2;
@@ -54,12 +45,13 @@ export class QuotesComponent implements OnInit, OnChanges {
     private _quotesService: QuotesService,
     private commonFunction: CommonFunction,
     private storage: LocalStorageService,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnInit() {}
 
-  ngOnChanges(changes: any) {
+  ngOnChanges(changes: any): void {
     if (
       changes.quotesWidgetObject != null &&
       changes.quotesWidgetObject.currentValue != undefined
@@ -77,10 +69,18 @@ export class QuotesComponent implements OnInit, OnChanges {
       this.setBackgroundWidgetDetail();
       this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
       this.quotesWidget = this.quotesWidgetObject;
-      this.selectedQuotesCategoryList =
-        this.quotesWidget.data.selectedQuoteCategories;
+      this.selectedQuotesCategoryList = [
+        ...this.quotesWidget.data.selectedQuoteCategories
+      ];
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].settings.initialValue["selectedQuotesCategoryList"] = [
+        ...this.quotesWidget.data.selectedQuoteCategories
+      ];
+
       this.lastSelectedQuotesCategoryList = [
-        ...this.quotesWidget.data.selectedQuoteCategories,
+        ...this.quotesWidget.data.selectedQuoteCategories
       ];
       // this.selectedQuotesLength = this.quotesWidget.data.selectedQuoteLength;
       // this.lastSelectedQuotesLength =
@@ -88,20 +88,25 @@ export class QuotesComponent implements OnInit, OnChanges {
     }
   }
 
-  setBackgroundWidgetDetail() {
+  setBackgroundWidgetDetail(): void {
     this.widgetType = this.category;
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
 
-  updateQuotesLength(updatedLength) {
+  updateQuotesLength(updatedLength): void {
     this.selectedQuotesLength = updatedLength.id;
   }
 
-  updateCategory(quoteId) {
+  updateCategory(quoteId): void {
     if (this.selectedQuotesCategoryList != undefined) {
       let ifExist = this.checkCategoryExist(quoteId);
       if (ifExist) {
@@ -141,7 +146,7 @@ export class QuotesComponent implements OnInit, OnChanges {
     return selectedQuotesCategories;
   }
 
-  isChangeFound() {
+  isChangeFound(): boolean {
     this.selectedQuotesCategoryList.sort((a, b) => b - a);
     let lastSelectedQuotesCategory = this.storage.get(
       "lastSelectedQuotesCategoryList"
@@ -161,17 +166,53 @@ export class QuotesComponent implements OnInit, OnChanges {
     } else return false;
   }
 
-  onbgsettingQuotesOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+    const initialQuotes =
+      settingsForm.initialValue["selectedQuotesCategoryList"];
+
+    const initialQuotesSet = new Set(initialQuotes);
+    const currentQuotesSet = new Set(this.selectedQuotesCategoryList);
+    const isSameQuotes =
+      initialQuotesSet.size === currentQuotesSet.size &&
+      initialQuotes.every((quote) => currentQuotesSet.has(quote));
+
+    if (!isSameQuotes) {
+      console.log("saving settings");
+      this.saveQuotesSetting();
+      settingsForm.initialValue["selectedQuotesCategoryList"] = [
+        ...this.selectedQuotesCategoryList
+      ];
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      console.log("saving format");
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    this.quoteSettingModal.hide();
   }
 
-  saveQuotesSetting() {
+  saveQuotesSetting(): void {
     let payload = {
       quotesCategories: this.getSelectedQuotesCategories(),
       widgetSetting: {
-        id: this.quotesWidgetObject.widgetSettingId,
-      },
+        id: this.quotesWidgetObject.widgetSettingId
+      }
     };
 
     this.loadingSpinner.show();
@@ -200,20 +241,22 @@ export class QuotesComponent implements OnInit, OnChanges {
     );
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event): void {
+    this.newBgSetting = event;
     const quotesBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.quotesWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
       quotesBgPayload
     );
+
     this.quoteSettingModal.hide();
   }
 
-  dismissModel() {
+  dismissModel(): void {
     this.quotesWidget = this.quotesWidgetObject;
     this.selectedQuotesCategoryList = this.lastSelectedQuotesCategoryList;
     this.selectedQuotesLength = this.lastSelectedQuotesLength;

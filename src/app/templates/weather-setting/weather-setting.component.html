@@ -30,157 +30,176 @@
         <!-- Tab panes -->
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="WeatherSetting">
-            <div class="bg-setting-box">
-              <div class="row">
-                <div
-                  class="col-12 text-align-left mt15"
-                  *ngIf="
-                    address || widgetLayoutDetails?.locationDeatls?.locationName
-                  "
-                >
-                  <label
-                    for="currentLocation"
-                    class="form-check m-0 form-check-inline cursor-pointer"
-                  >
-                    Currently Selected Location
-                    <span class="form-check-label ml20" style="color: green">{{
+            <form [formGroup]="fb">
+              <div class="bg-setting-box">
+                <div class="row">
+                  <div
+                    class="col-12 text-align-left mt15"
+                    *ngIf="
                       address ||
-                        widgetLayoutDetails?.locationDeatls.locationName
-                    }}</span>
-                  </label>
-                </div>
-                <div class="col-12 mt15 text-align-left">
-                  <label
-                    for="selectLocation"
-                    class="form-check form-check-inline cursor-pointer"
+                      widgetLayoutDetails?.locationDeatls?.locationName
+                    "
                   >
-                    <span class="form-check-label">Select Location</span>
-                  </label>
-                </div>
-                <div
-                  class="col-12 location-block mt10"
-                  [class.show-location-block]="currentLocation"
-                >
-                  <div class="select-location ml20">
-                    <input
-                      #search
-                      type="text"
-                      class="form-control"
-                      placeholder="Search Address OR City"
-                      (keydown.enter)="$event.preventDefault()"
-                      autocorrect="off"
-                      autocapitalize="off"
-                      spellcheck="off"
-                      [(ngModel)]="initAddress"
-                    />
+                    <label
+                      for="currentLocation"
+                      class="form-check m-0 form-check-inline cursor-pointer"
+                    >
+                      Currently Selected Location
+                      <span
+                        class="form-check-label ml20"
+                        style="color: green"
+                        >{{
+                          address ||
+                            widgetLayoutDetails?.locationDeatls.locationName
+                        }}</span
+                      >
+                    </label>
                   </div>
-                </div>
-
-                <div class="col-12 mt15">
-                  <div class="col-12 float-left text-align-left lh30 p0">
-                    Weather Type
+                  <div class="col-12 mt15 text-align-left">
+                    <label
+                      for="selectLocation"
+                      class="form-check form-check-inline cursor-pointer"
+                    >
+                      <span class="form-check-label">Select Location</span>
+                    </label>
                   </div>
                   <div
-                    class="col-12 btn-group btn-group-justified float-left block mt10"
+                    class="col-12 location-block mt10"
+                    [class.show-location-block]="currentLocation"
                   >
-                    <a
-                      class="btn cal-btn-primary pd6"
-                      [ngClass]="{
-                        'cal-primary-active': weatherType === 'Today\'s Weather'
-                      }"
-                      (click)="weatherType = 'Today\'s Weather'"
-                    >
-                      <i
-                        *ngIf="weatherType === 'Today\'s Weather'"
-                        class="fa fa-check"
-                        aria-hidden="true"
-                      ></i>
-                      Today's Weather</a
-                    >
-                    <a
-                      class="btn cal-btn-primary pd6"
-                      [ngClass]="{
-                        'cal-primary-active':
-                          weatherType === '24 Hour Weather Forecast'
-                      }"
-                      (click)="weatherType = '24 Hour Weather Forecast'"
-                    >
-                      <i
-                        *ngIf="weatherType === '24 Hour Weather Forecast'"
-                        class="fa fa-check"
-                        aria-hidden="true"
-                      ></i>
-                      24 Hour Weather forecast</a
-                    >
-                    <a
-                      class="btn cal-btn-primary pd6"
-                      [ngClass]="{
-                        'cal-primary-active':
-                          weatherType === '5 Day Weather Forecast'
-                      }"
-                      (click)="weatherType = '5 Day Weather Forecast'"
-                    >
-                      <i
-                        *ngIf="weatherType === '5 Day Weather Forecast'"
-                        class="fa fa-check"
-                        aria-hidden="true"
-                      ></i>
-                      5 Day Weather Forecast</a
-                    >
+                    <div class="select-location ml20">
+                      <input
+                        #search
+                        type="text"
+                        class="form-control"
+                        placeholder="Search Address OR City"
+                        (keydown.enter)="$event.preventDefault()"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="off"
+                        formControlName="address"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div class="col-12 mt15 text-align-left">
-                  <div class="col-12 p0">Unit of display</div>
-                  <div class="col-3 text-align-right mt10">
-                    <select
-                      class="form-control select-bg-image"
-                      placeholder="Select Temp"
-                      [(ngModel)]="measureUnitData.temperatureUnit.unit"
-                      (change)="
-                        onUnitMeasureChanges(
-                          measureUnitData.temperatureUnit.unit
-                        )
-                      "
+                  <div class="col-12 mt15">
+                    <div class="col-12 float-left text-align-left lh30 p0">
+                      Weather Type
+                    </div>
+                    <div
+                      class="col-12 btn-group btn-group-justified float-left block mt10"
                     >
-                      <option
-                        [selected]="
-                          measureUnitData.temperatureUnit.unit === 'Celsius'
+                      <a
+                        class="btn cal-btn-primary pd6"
+                        [ngClass]="{
+                          'cal-primary-active':
+                            weatherType === WeatherType.TodayWeather
+                        }"
+                        (click)="
+                          weatherType = 'Today\'s Weather';
+                          setWeatherType(WeatherType.TodayWeather)
                         "
-                        value="Celsius"
                       >
-                        {{ "Celsius" }}
-                      </option>
-                      <option
-                        [selected]="
-                          measureUnitData.temperatureUnit.unit === 'Fahrenheit'
+                        <i
+                          *ngIf="weatherType === WeatherType.TodayWeather"
+                          class="fa fa-check"
+                          aria-hidden="true"
+                        ></i>
+                        Today's Weather</a
+                      >
+                      <a
+                        class="btn cal-btn-primary pd6"
+                        [ngClass]="{
+                          'cal-primary-active':
+                            weatherType === WeatherType.WeatherForecast24Hours
+                        }"
+                        (click)="
+                          weatherType = '24 Hour Weather Forecast';
+                          setWeatherType(WeatherType.WeatherForecast24Hours)
                         "
-                        value="Fahrenheit"
                       >
-                        {{ "Fahrenheit" }}
-                      </option>
-                    </select>
+                        <i
+                          *ngIf="
+                            weatherType === WeatherType.WeatherForecast24Hours
+                          "
+                          class="fa fa-check"
+                          aria-hidden="true"
+                        ></i>
+                        24 Hour Weather forecast</a
+                      >
+                      <a
+                        class="btn cal-btn-primary pd6"
+                        [ngClass]="{
+                          'cal-primary-active':
+                            weatherType === WeatherType.WeatherForecast5Days
+                        }"
+                        (click)="
+                          weatherType = '5 Day Weather Forecast';
+                          setWeatherType(WeatherType.WeatherForecast5Days)
+                        "
+                      >
+                        <i
+                          *ngIf="
+                            weatherType === WeatherType.WeatherForecast5Days
+                          "
+                          class="fa fa-check"
+                          aria-hidden="true"
+                        ></i>
+                        5 Day Weather Forecast</a
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 mt15 text-align-left">
+                    <div class="col-12 p0">Unit of display</div>
+                    <div class="col-3 text-align-right mt10">
+                      <select
+                        class="form-control select-bg-image"
+                        placeholder="Select Temp"
+                        formControlName="temperatureUnit"
+                        (change)="onUnitMeasureChanges($event.target.value)"
+                      >
+                        <option
+                          [selected]="
+                            measureUnitData?.temperatureUnit?.unit === 'Celsius'
+                          "
+                          [value]="'Celsius'"
+                        >
+                          {{ "Celsius" }}
+                        </option>
+                        <option
+                          [selected]="
+                            measureUnitData?.temperatureUnit?.unit ===
+                            'Fahrenheit'
+                          "
+                          [value]="'Fahrenheit'"
+                        >
+                          {{ "Fahrenheit" }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 footer-btn-position">
+                    <button
+                      type="button"
+                      class="btn btn-secondary mr-20"
+                      (click)="dismissModel()"
+                    >
+                      CANCEL
+                    </button>
+                    <button
+                      class="btn btn-primary"
+                      type="button"
+                      (click)="save()"
+                    >
+                      SAVE
+                    </button>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-12 footer-btn-position">
-                  <button
-                    type="button"
-                    class="btn btn-secondary mr-20"
-                    (click)="dismissModel()"
-                  >
-                    CANCEL
-                  </button>
-                  <button
-                    class="btn btn-primary"
-                    (click)="saveWeatherchanges()"
-                  >
-                    SAVE
-                  </button>
-                </div>
-              </div>
-            </div>
+            </form>
           </div>
           <div
             role="tabpanel"
@@ -190,7 +209,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingWeatherOptions)="onbgsettingWeatherOptions($event)"
+              (emitbgsettingWeatherOptions)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>

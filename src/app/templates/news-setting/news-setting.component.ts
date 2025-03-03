@@ -1,20 +1,32 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild
+} from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { WidgetService } from "src/app/service/widget.service";
 import { DataService } from "src/app/service/data.service";
 import { CommonFunction } from "src/app/service/common-function.service";
 import {
   LayoutRequest,
-  WidgetBackgroundSetting,
+  WidgetBackgroundSetting
 } from "src/app/util/static-data";
 import { LocalStorageService } from "angular-web-storage";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
 
 @Component({
   selector: "app-news-setting",
   templateUrl: "./news-setting.component.html",
-  styleUrls: ["./news-setting.component.scss"],
+  styleUrls: ["./news-setting.component.scss"]
 })
 export class NewsSettingComponent implements OnInit {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() newsSettingModal: any;
   @Input() category: string;
   @Input() activeLayout: any;
@@ -43,7 +55,7 @@ export class NewsSettingComponent implements OnInit {
     "the-guardian-uk",
     "the-new-york-times",
     "the-telegraph",
-    "wirtschafts-woche",
+    "wirtschafts-woche"
   ];
 
   //background widget setting
@@ -57,7 +69,8 @@ export class NewsSettingComponent implements OnInit {
     private _dataService: DataService,
     private commonFunction: CommonFunction,
     private layoutRequest: LayoutRequest,
-    private storage: LocalStorageService
+    private storage: LocalStorageService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnInit() {}
@@ -87,6 +100,12 @@ export class NewsSettingComponent implements OnInit {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -111,6 +130,15 @@ export class NewsSettingComponent implements OnInit {
         }
       });
     });
+
+    this.widgetDataService.widgetFormState[this.category].settings.initialValue[
+      "initialSelectedNewsWidgets"
+    ] = [...this.selectedNewsWidgets];
+    console.log(
+      this.widgetDataService.widgetFormState[this.category].settings
+        .initialValue
+    );
+
     newsCategoryList.forEach((element) => {
       if (this.selectedNewsWidgets.includes(element.id)) {
         element["status"] = "on";
@@ -188,31 +216,69 @@ export class NewsSettingComponent implements OnInit {
     this.settingDisplayflag = true;
   }
 
-  onbgsettingNewsOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+    const initialNewsIds =
+      settingsForm.initialValue["initialSelectedNewsWidgets"];
+
+    const initialNewsIdsSet = new Set(initialNewsIds);
+    const currentNewsIdSet = new Set(this.selectedNewsWidgets);
+    const isSameNews =
+      initialNewsIdsSet.size === currentNewsIdSet.size &&
+      initialNewsIds.every((quote) => currentNewsIdSet.has(quote));
+
+    console.log(isSameNews);
+
+    if (!isSameNews) {
+      console.log("saving settings...");
+      this.saveNewsSettings();
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      console.log("saving format");
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    // this.newsSettingModal.hide();
   }
 
-  saveNewsSettings() {
+  saveNewsSettings(): void {
     this._dataService
       .getActiveMirrorDetails()
       .subscribe((data) => (this.activeMirrorDetail = data));
+    console.log(this.activeMirrorDetail);
+    console.log(this.selectedHeadLineCount);
     this.updateNewsCountEventEmiter.emit(this.selectedHeadLineCount);
     this.updateWidgetStatusEventEmiter.emit();
-    this.newsSettingModal.hide();
+    // this.newsSettingModal.hide();
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event): void {
+    this.newBgSetting = event;
     const newsBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.newsWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(this.newBgSetting, newsBgPayload);
-    this.newsSettingModal.hide();
+    // this.newsSettingModal.hide();
   }
 
   dismissModel() {
-    this.newsSettingModal.hide();
+    // this.newsSettingModal.hide();
   }
 }

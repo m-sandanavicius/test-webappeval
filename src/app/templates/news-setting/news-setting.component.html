@@ -1,80 +1,128 @@
 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-        <div class="modal-header custom-modal-header">
-            Add a News widget
-        </div>
-        <div class="modal-body">
-            <div role="tabpanel">
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item"><a href="#NewsTab1" class="nav-link active" aria-controls="NewsTab1" role="tab" data-toggle="tab">Settings</a>
-
-                    </li>
-                    <li class="nav-item" style="margin-left: 10px;"><a href="#NewsTab2" class="nav-link" aria-controls="NewsTab2" role="tab" data-toggle="tab" (click)="setBackgroundWidgetDetail()">Format</a>
-
-                    </li>
-                </ul>
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="NewsTab1">
-                        <div class="row mt30">
-                            <div class="col-12">
-                                <div class="float-left fit-content-width">
-                                    Number of headlines to display:
-                                </div>
-                                <div class="float-right">
-                                    <div class="headline-count">
-                                        <div class="display-flex dropdown-toggle" data-toggle="dropdown">
-                                            {{ selectedHeadLineCount }}
-                                            <div class="down-arrow ml5" style="margin-top: 4px;"></div>
-                                        </div>
-                                        <div class="dropdown-menu" role="menu">
-                                            <div *ngFor="let headlineCount of headlineCountList" (click)="setHeadLineCount(headlineCount)" [class.selected-count]="
-                        headlineCount === selectedHeadLineCount
-                      ">
-                                                {{ headlineCount }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="news-setting-box mt10 mobile-mb50">                            
-                            <div class="row mt5">
-                                <div class="col-12 text-align-left">
-                                    <div class="news-source">Select News Sources</div>
-                                </div>                                
-                            </div>
-                            <div class="sub-list-container">
-                                <div class="row">
-                                    <div class="col-12 mt10" *ngFor=" let newsCategory of newsCategoryList
-                        | CustomSort: 'asc':'displayName';
-                        let index = index">
-                                        <div class="full-width" (click)="changeNewsSetting(newsCategory, index)">
-                                            <div class="float-left fit-content-width">
-                                                {{ newsCategory.displayName }}
-                                            </div>
-                                            <div class="float-right pr10" *ngIf="newsCategory.status == 'on'">
-                                                <div class="active-news-option"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 footer-btn-position">
-                                <button type="button" class="btn btn-secondary mr-20"  (click)="dismissModel()">CANCEL</button>
-                                <button class="btn btn-primary" (click)="saveNewsSettings()">Save</button>
-                            </div> 
-                        </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane mt15 bg-setting-box" id="NewsTab2" >
-                        <app-widget-bg-setting [widgetbgsetting]="widgetBgSetting" [widgetType]="widgetType" (emitbgsettingNewsOptions)="onbgsettingNewsOptions($event)" (closeModalEvent)="dismissModel()"> </app-widget-bg-setting>
-                    </div>
+  <div class="modal-content">
+    <div class="modal-header custom-modal-header">Add a News widget</div>
+    <div class="modal-body">
+      <div role="tabpanel">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a
+              href="#NewsTab1"
+              class="nav-link active"
+              aria-controls="NewsTab1"
+              role="tab"
+              data-toggle="tab"
+              >Settings</a
+            >
+          </li>
+          <li class="nav-item" style="margin-left: 10px">
+            <a
+              href="#NewsTab2"
+              class="nav-link"
+              aria-controls="NewsTab2"
+              role="tab"
+              data-toggle="tab"
+              (click)="setBackgroundWidgetDetail()"
+              >Format</a
+            >
+          </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="NewsTab1">
+            <div class="row mt30">
+              <div class="col-12">
+                <div class="float-left fit-content-width">
+                  Number of headlines to display:
                 </div>
+                <div class="float-right">
+                  <div class="headline-count">
+                    <div
+                      class="display-flex dropdown-toggle"
+                      data-toggle="dropdown"
+                    >
+                      {{ selectedHeadLineCount }}
+                      <div class="down-arrow ml5" style="margin-top: 4px"></div>
+                    </div>
+                    <div class="dropdown-menu" role="menu">
+                      <div
+                        *ngFor="let headlineCount of headlineCountList"
+                        (click)="setHeadLineCount(headlineCount)"
+                        [class.selected-count]="
+                          headlineCount === selectedHeadLineCount
+                        "
+                      >
+                        {{ headlineCount }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
+            <div class="news-setting-box mt10 mobile-mb50">
+              <div class="row mt5">
+                <div class="col-12 text-align-left">
+                  <div class="news-source">Select News Sources</div>
+                </div>
+              </div>
+              <div class="sub-list-container">
+                <div class="row">
+                  <div
+                    class="col-12 mt10"
+                    *ngFor="
+                      let newsCategory of newsCategoryList
+                        | CustomSort : 'asc' : 'displayName';
+                      let index = index
+                    "
+                  >
+                    <div
+                      class="full-width"
+                      (click)="changeNewsSetting(newsCategory, index)"
+                    >
+                      <div class="float-left fit-content-width">
+                        {{ newsCategory.displayName }}
+                      </div>
+                      <div
+                        class="float-right pr10"
+                        *ngIf="newsCategory.status == 'on'"
+                      >
+                        <div class="active-news-option"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 footer-btn-position">
+                <button
+                  type="button"
+                  class="btn btn-secondary mr-20"
+                  (click)="dismissModel()"
+                >
+                  CANCEL
+                </button>
+                <button class="btn btn-primary" type="button" (click)="save()">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            role="tabpanel"
+            class="tab-pane mt15 bg-setting-box"
+            id="NewsTab2"
+          >
+            <app-widget-bg-setting
+              [widgetbgsetting]="widgetBgSetting"
+              [widgetType]="widgetType"
+              (emitbgsettingNewsOptions)="save()"
+              (closeModalEvent)="dismissModel()"
+            >
+            </app-widget-bg-setting>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>

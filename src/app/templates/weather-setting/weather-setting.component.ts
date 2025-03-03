@@ -8,28 +8,33 @@ import {
   Output,
   Input,
   EventEmitter,
-  AfterViewInit,
+  AfterViewInit
 } from "@angular/core";
 import { WidgetService } from "src/app/service/widget.service";
 import { LocalStorageService } from "angular-web-storage";
 import { DataService } from "src/app/service/data.service";
 import { MapsAPILoader } from "@agm/core";
-import { FormControl } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { ProfileService } from "src/app/service/profile.service";
 import { CommonFunction } from "src/app/service/common-function.service";
 import { WidgetBackgroundSetting } from "src/app/util/static-data";
 import { WeatherService } from "src/app/service/weather.service";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
 
 @Component({
   selector: "app-weather-setting",
   templateUrl: "./weather-setting.component.html",
-  styleUrls: ["./weather-setting.component.scss"],
+  styleUrls: ["./weather-setting.component.scss"]
 })
 export class WeatherSettingComponent
   implements OnInit, OnChanges, AfterViewInit
 {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() weatherSettingModal: any;
   @Input() category: string;
   @Input() activeLayout: any;
@@ -70,6 +75,9 @@ export class WeatherSettingComponent
   newBgSetting: any;
   weatherWidgetData: any;
 
+  fg: FormGroup;
+  WeatherType = WeatherType;
+
   constructor(
     private _weatherService: WeatherService,
     private storage: LocalStorageService,
@@ -79,10 +87,18 @@ export class WeatherSettingComponent
     private toastr: ToastrService,
     private _profileService: ProfileService,
     private commonFunction: CommonFunction,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService,
+    private formBuilder: FormBuilder
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fg = this.formBuilder.group({
+      address: [],
+      weatherType: [],
+      temperatureUnit: [""]
+    });
+  }
 
   ngAfterViewInit() {
     this.searchControl = new FormControl();
@@ -115,7 +131,7 @@ export class WeatherSettingComponent
           let location = {
             latitude: this.latitude,
             longitude: this.longitude,
-            locationName: this.address,
+            locationName: this.address
           };
           this.storage.set("location", location);
         });
@@ -142,7 +158,7 @@ export class WeatherSettingComponent
             let location = {
               latitude: this.latitude,
               longitude: this.longitude,
-              address: this.address,
+              address: this.address
             };
             this.storage.set("location", location);
             this.getAddress(this.latitude, this.longitude);
@@ -161,9 +177,15 @@ export class WeatherSettingComponent
 
   setBackgroundWidgetDetail() {
     this.widgetType = this.category;
+    console.log(this.category);
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -173,20 +195,44 @@ export class WeatherSettingComponent
       changes.weatherWidgetObject &&
       changes.weatherWidgetObject.currentValue != undefined
     ) {
+      console.log("ngOnChanges executed");
+      //       address: [],
+      // weatherType: [],
+      // temperatureUnit: []
+
       this._dataService.getWidgetSettingsLayout().subscribe((data) => {
         this.widgetLayoutDetails = data;
+        console.log(this.widgetLayoutDetails);
         this.widgetSettings = data.widgetSetting;
       });
       let locationDetails =
         this.weatherWidgetObject.data.weatherWidgetDetail.location;
       if (locationDetails != null && locationDetails != undefined) {
         // this.storage.set("location", locationDetails);
+        this.fg.controls.address.setValue(locationDetails.locationName);
         this.address = locationDetails.locationName;
+        console.log(this.address);
       }
       this.weatherWidgetData =
         this.weatherWidgetObject.data.weatherWidgetDetail;
       this.weatherType =
         this.weatherWidgetObject.data.weatherWidgetDetail.weatherType;
+
+      this.widgetDataService.widgetFormState.weather.settings.currentValue[
+        "weatherType"
+      ] = this.weatherWidgetObject.data.weatherWidgetDetail.weatherType;
+
+      console.log(this.widgetDataService.widgetFormState.weather.settings);
+      this.fg.controls.weatherType.setValue(
+        this.weatherWidgetObject.data.weatherWidgetDetail.weatherType
+      );
+
+      // set initial value of settings form
+      this.widgetDataService.widgetFormState.weather.settings.initialValue = {
+        ...this.fg.value
+      };
+
+      console.log(this.fg.controls);
     }
     this.setBackgroundWidgetDetail();
     let userData = this.storage.get("userDetails");
@@ -194,8 +240,8 @@ export class WeatherSettingComponent
       temperatureUnit: {
         unit: userData.temperatureUnit,
         measure: ["Celsius", "Fahrenheit"],
-        activeUnit: userData.temperatureUnit,
-      },
+        activeUnit: userData.temperatureUnit
+      }
     };
   }
 
@@ -203,8 +249,8 @@ export class WeatherSettingComponent
     let data = {
       location: {
         lat: latitude,
-        lng: longitude,
-      },
+        lng: longitude
+      }
     };
 
     this.geoCoder.geocode(data, (results, status) => {
@@ -231,16 +277,47 @@ export class WeatherSettingComponent
     this.widgetBgSetting = element.widgetBackgroundSettingModel;
   }
 
-  onbgsettingWeatherOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState.weather.settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      this.fg.value
+    );
+
+    if (isSettingsFormChanged) {
+      console.log("settins saving...");
+      this.saveWeatherchanges();
+      settingsForm.initialValue = this.fg.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm = this.widgetDataService.widgetFormState.weather.format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      console.log("saving format");
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    this.weatherSettingModal.hide();
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event): void {
+    this.newBgSetting = event;
     const weatherBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: ["weather"],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -249,7 +326,7 @@ export class WeatherSettingComponent
     this.weatherSettingModal.hide();
   }
 
-  saveWeatherchanges() {
+  saveWeatherchanges(): void {
     var location = this.storage.get("location");
     if (location == undefined) {
       location = this.weatherWidgetData.location;
@@ -257,23 +334,23 @@ export class WeatherSettingComponent
     let payload = {};
     payload["id"] = this.weatherWidgetData.id;
     payload["widgetSetting"] = {
-      id: this.weatherWidgetObject.widgetSettingId,
+      id: this.weatherWidgetObject.widgetSettingId
     };
     payload["weatherType"] = this.weatherType;
-
     if (location != null) {
       let locationData = {
         locationName: location.locationName,
         longitude: location.longitude,
         latitude: location.latitude,
-        language: location.language,
+        language: location.language
       };
-
       if (location.id != undefined) {
         locationData["id"] = location.id;
       }
       payload["location"] = locationData;
     }
+    console.log(this.fg.controls);
+    console.log(payload);
     this.loadingSpinner.show();
     this._weatherService.updateWeatherSetting(payload).subscribe(
       (res: any) => {
@@ -310,11 +387,17 @@ export class WeatherSettingComponent
     );
   }
 
-  onUnitMeasureChanges(newUnit: string) {
+  // saves onitself
+  onUnitMeasureChanges(newUnit: string): void {
+    // console.log(newUnit);
     this.measureUnitData.temperatureUnit.activeUnit = newUnit;
     let payload: any = {
-      temperatureUnit: this.measureUnitData.temperatureUnit.activeUnit,
+      temperatureUnit: this.measureUnitData.temperatureUnit.activeUnit
     };
+    this.fg.get("temperatureUnit").setValue(newUnit);
+
+    console.log(this.fg.controls);
+
     this._profileService.updateUnitMeasuresAPI(payload).subscribe(
       (res: any) => {
         this.toastr.success(res.message, "Success");
@@ -328,7 +411,26 @@ export class WeatherSettingComponent
     );
   }
 
+  // maybe not needed
+  setWeatherType(weatherType: string): void {
+    console.log(weatherType);
+    this.fg.controls.weatherType.setValue(weatherType);
+    console.log(this.fg.controls.weatherType);
+  }
+
+  compare(option: any, value: any): boolean {
+    console.log(option);
+    console.log(value);
+    return option === value;
+  }
+
   dismissModel() {
     this.weatherSettingModal.hide();
   }
+}
+
+enum WeatherType {
+  TodayWeather = "Today's Weather",
+  WeatherForecast24Hours = "24 Hour Weather Forecast",
+  WeatherForecast5Days = "5 Day Weather Forecast"
 }
