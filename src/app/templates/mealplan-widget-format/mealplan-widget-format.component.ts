@@ -4,6 +4,7 @@ import { LocalStorageService } from "angular-web-storage";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { ToastrService } from "ngx-toastr";
 import { DataService } from "src/app/service/data.service";
+import { WidgetDataService } from "src/app/service/widget-data.service";
 import { WidgetService } from "src/app/service/widget.service";
 import {
   calendar_monthview_weeksToShow,
@@ -11,13 +12,13 @@ import {
   calendar_monthview_selectedMonth,
   calendar_monthview_dateSize,
   text_alignment,
-  schedule_daysToShow,
+  schedule_daysToShow
 } from "src/app/util/static-data";
 
 @Component({
   selector: "app-mealplan-widget-format",
   templateUrl: "./mealplan-widget-format.component.html",
-  styleUrls: ["./mealplan-widget-format.component.scss"],
+  styleUrls: ["./mealplan-widget-format.component.scss"]
 })
 export class MealplanWidgetFormatComponent implements OnInit {
   @Output() closeModalEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -61,7 +62,7 @@ export class MealplanWidgetFormatComponent implements OnInit {
   selected_plan: any;
   week_time_slot_selection = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22, 23,
+    21, 22, 23
   ];
   week_range = [1, 2, 3, 4];
   eventRangeSelection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -94,7 +95,7 @@ export class MealplanWidgetFormatComponent implements OnInit {
     showLegends: false,
     list_event_type: "Tomorrow",
     isPastEventEnabled: true,
-    list_no_days: 5,
+    list_no_days: 5
   };
   default_w_weeksToShow: number = 1;
 
@@ -104,7 +105,8 @@ export class MealplanWidgetFormatComponent implements OnInit {
     private storage: LocalStorageService,
     private _dataService: DataService,
     private toastr: ToastrService,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {
     this.selected_plan = "current_week";
   }
@@ -181,29 +183,29 @@ export class MealplanWidgetFormatComponent implements OnInit {
       this.calendarFormatFormGroup = this.formBuilder.group({
         showLocation: [
           calendarFormatData ? calendarFormatData.showLocation : true,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
         showEndDate: [
           calendarFormatData ? calendarFormatData.showEndDate : false,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
         numberOfEvent: [
           calendarFormatData.numberOfEvent
             ? calendarFormatData.numberOfEvent
             : 5,
-          Validators.required,
+          Validators.required
         ],
 
         list_no_days: [
           calendarFormatData.list_no_days ? calendarFormatData.list_no_days : 5,
-          Validators.required,
+          Validators.required
         ],
 
         list_event_type: [
           calendarFormatData.list_event_type
             ? calendarFormatData.list_event_type
             : "Tomorrow",
-          Validators.required,
+          Validators.required
         ],
 
         // schedule
@@ -211,23 +213,23 @@ export class MealplanWidgetFormatComponent implements OnInit {
           calendarFormatData
             ? calendarFormatData.schedule_days_selection
             : "current_week",
-          Validators.required,
+          Validators.required
         ],
         day_start_time: [
           calendarFormatData ? calendarFormatData.day_start_time : 9,
-          Validators.required,
+          Validators.required
         ],
         day_end_time: [
           calendarFormatData ? calendarFormatData.day_end_time : 17,
-          Validators.required,
+          Validators.required
         ],
         showWeekDaysOnly: [
           calendarFormatData ? calendarFormatData.showWeekDaysOnly : false,
-          Validators.required,
+          Validators.required
         ],
         schedule_title: [
           calendarFormatData ? calendarFormatData.schedule_title : true,
-          Validators.required,
+          Validators.required
         ],
 
         // week month
@@ -235,30 +237,54 @@ export class MealplanWidgetFormatComponent implements OnInit {
           calendarFormatData
             ? calendarFormatData.w_weeksToShow
             : this.default_w_weeksToShow,
-          Validators.required,
+          Validators.required
         ],
         m_weeksToShow: [
           calendarFormatData ? calendarFormatData.m_weeksToShow : 1,
-          Validators.required,
+          Validators.required
         ],
         m_selectedMonth: [
           calendarFormatData ? calendarFormatData.m_selectedMonth : 0,
-          Validators.required,
+          Validators.required
         ],
         word_wrap: [
           calendarFormatData ? calendarFormatData.word_wrap : false,
-          Validators.required,
+          Validators.required
         ],
         isPastEventEnabled: [
           calendarFormatData ? calendarFormatData.isPastEventEnabled : true,
-          Validators.required,
+          Validators.required
         ],
         showLegends: [
           calendarFormatData ? calendarFormatData.showLegends : false,
-          Validators.required,
-        ],
+          Validators.required
+        ]
       });
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].settings.initialValue = {
+        ...this.calendarFormatFormGroup.value,
+        ...this.getMealPlanSettingsAdditionalProps()
+      };
     }
+  }
+
+  getMealPlanSettingsAdditionalProps() {
+    return {
+      id: this.calendarCurrentFormatSetting.id || null,
+      scrolling: this.scrolling,
+      calendarType: this.calendarType,
+      image_size: this.image_size,
+      m_date_allignment: this.m_date_allignment,
+      m_date_fontsize: this.m_date_fontsize,
+      m_scroll: this.m_scroll,
+      weekStartWith: this.weekStartWith
+    };
+  }
+
+  onMealPlanSettingsSave(): void {
+    this.updateWidgetStatusEventEmiter.emit();
   }
 
   dismissModel() {
@@ -269,7 +295,7 @@ export class MealplanWidgetFormatComponent implements OnInit {
     let payload = {
       userMirrorId: this.activeMirrorDetail.id,
       calendarWidgetFormattingModel: this.calendarFormatFormGroup.value,
-      widgetSettingId: this.calendarWidgetObject.widgetSettingId,
+      widgetSettingId: this.calendarWidgetObject.widgetSettingId
     };
     delete payload.calendarWidgetFormattingModel.upNextSetting;
 

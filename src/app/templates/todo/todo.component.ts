@@ -163,7 +163,6 @@ export class TodoComponent implements OnInit, OnChanges {
       widgetSettingId: this.todoWidgetObject.widgetSettingId,
       selectedTodoProject: this.previouslyAddedProjects
     };
-    console.log(this.previouslyAddedProjects);
     this.loadingSpinner.show();
     this._todoService.updateSelectedProject(payload).subscribe(
       (res: any) => {

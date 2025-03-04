@@ -268,7 +268,8 @@
                   </button>
                   <button
                     class="btn btn-primary"
-                    (click)="saveCalendarSettings()"
+                    type="button"
+                    (click)="save()"
                   >
                     SAVE
                   </button>
@@ -284,7 +285,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingMealPlanOptions)="onbgsettingOptions($event)"
+              (emitbgsettingMealPlanOptions)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>
@@ -297,9 +298,7 @@
             <app-mealplan-widget-format
               [category]="category"
               (closeModalEvent)="dismissModel()"
-              (updateWidgetStatusEventEmiter)="
-                updatecalendarWidgetStatus($event)
-              "
+              (updateWidgetStatusEventEmiter)="save()"
               [activeLayout]="activeLayout"
               [calendarWidgetObject]="mealWidgetObject"
             >

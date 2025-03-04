@@ -87,6 +87,17 @@ export class WidgetDataService {
       format: {
         initialValue: {}
       }
+    },
+    mealplan: {
+      calendars: {
+        initialValue: {}
+      },
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
     }
   };
 
