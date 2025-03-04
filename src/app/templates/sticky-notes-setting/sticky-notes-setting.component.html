@@ -49,7 +49,7 @@
                 >
                   CANCEL
                 </button>
-                <button class="btn btn-primary" (click)="saveNotesSetting()">
+                <button class="btn btn-primary" type="button" (click)="save()">
                   SAVE
                 </button>
               </div>
@@ -63,7 +63,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingNoteOptions)="onbgsettingOptions($event)"
+              (emitbgsettingNoteOptions)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>

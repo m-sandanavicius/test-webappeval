@@ -1,26 +1,23 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnChanges,
-  Output,
-  EventEmitter,
-} from "@angular/core";
+import { Component, OnInit, Input, OnChanges, ViewChild } from "@angular/core";
 import { AngularEditorConfig } from "@kolkov/angular-editor";
 import { DataService } from "src/app/service/data.service";
 import { LocalStorageService } from "angular-web-storage";
-import { WidgetService } from "src/app/service/widget.service";
 import { CommonFunction } from "src/app/service/common-function.service";
 import { NotesService } from "src/app/service/notes.service";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { ToastrService } from "ngx-toastr";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
 
 @Component({
   selector: "app-sticky-notes-setting",
   templateUrl: "./sticky-notes-setting.component.html",
-  styleUrls: ["./sticky-notes-setting.component.scss"],
+  styleUrls: ["./sticky-notes-setting.component.scss"]
 })
 export class StickyNotesSettingComponent implements OnInit, OnChanges {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() notesSettingModal: any;
   @Input() category: string;
   @Input() activeLayout: any;
@@ -62,9 +59,9 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
         "insertImage",
         "fontSize",
         "fontName",
-        "heading",
-      ],
-    ],
+        "heading"
+      ]
+    ]
   };
 
   constructor(
@@ -73,7 +70,8 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     private toastr: ToastrService,
     private _notesService: NotesService,
     private commonFunction: CommonFunction,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnInit() {}
@@ -91,6 +89,12 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
       if (this.notesWidgetObject != undefined) {
         if (this.notesWidgetObject.data != null) {
           this.oldData = this.notesWidgetObject.data;
+
+          this.widgetDataService.widgetFormState[
+            this.category
+          ].settings.initialValue = {
+            ...this.notesWidgetObject.data.notesWidgetDetail.notesData
+          };
         }
         this.setBackgroundWidgetDetail();
         this.openTextEditorToAddNewNote();
@@ -103,6 +107,12 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -122,13 +132,38 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     }
   }
 
-  dismissModal() {
-    this.notesSettingModal.hide();
-  }
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
 
-  onbgsettingOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      this.notesBodyContent
+    );
+
+    if (isSettingsFormChanged) {
+      this.saveNotesSetting();
+      settingsForm.initialValue = this.notesBodyContent;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    this.notesSettingModal.hide();
   }
 
   saveNotesSetting() {
@@ -136,8 +171,8 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
       id: this.notesWidgetObject.data.notesWidgetDetail.id,
       notesData: this.notesBodyContent,
       widgetSetting: {
-        id: this.notesWidgetObject.widgetSettingId,
-      },
+        id: this.notesWidgetObject.widgetSettingId
+      }
     };
 
     this.loadingSpinner.show();
@@ -156,7 +191,6 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
         });
         this.widgetLayoutDetails.widgetSetting = this.widgetSettings;
         this._dataService.setWidgetSettingsLayout(this.widgetLayoutDetails);
-        this.notesSettingModal.hide();
       },
       (err: any) => {
         this.loadingSpinner.hide();
@@ -165,17 +199,17 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     );
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event) {
+    this.newBgSetting = event;
     const stickyBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.notesWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
       stickyBgPayload
     );
-    this.notesSettingModal.hide();
   }
 
   setDisplayflag() {
@@ -186,6 +220,10 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     if (this.notesWidgetObject.data != undefined) {
       this.notesWidgetObject.data = this.oldData;
     }
+    this.notesSettingModal.hide();
+  }
+
+  dismissModal() {
     this.notesSettingModal.hide();
   }
 }
