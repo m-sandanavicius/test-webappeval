@@ -38,6 +38,33 @@ export class WidgetDataService {
       format: {
         initialValue: {}
       }
+    },
+    count_down: {
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
+    },
+    notes: {
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
+    },
+    calendar: {
+      calendars: {
+        initialValue: {}
+      },
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
     }
   };
 
