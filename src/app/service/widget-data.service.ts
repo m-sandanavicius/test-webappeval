@@ -76,6 +76,17 @@ export class WidgetDataService {
       format: {
         initialValue: {}
       }
+    },
+    todo: {
+      todos: {
+        initialValue: {}
+      },
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
     }
   };
 

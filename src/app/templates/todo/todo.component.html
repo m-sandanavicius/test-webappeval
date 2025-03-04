@@ -250,7 +250,11 @@
                   >
                     CANCEL
                   </button>
-                  <button class="btn btn-primary" (click)="saveTodoSettings()">
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    (click)="save()"
+                  >
                     SAVE
                   </button>
                 </div>
@@ -264,6 +268,7 @@
           >
             <app-todo-widget-format
               (closeModalEvent)="dismissModel()"
+              (updateWidgetStatusEventEmiter)="save()"
               [category]="category"
               [activeLayout]="activeLayout"
               [todoWidgetObject]="todoWidgetObject"
@@ -278,7 +283,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingTodo)="onbgsettingOptions($event)"
+              (emitbgsettingTodo)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>

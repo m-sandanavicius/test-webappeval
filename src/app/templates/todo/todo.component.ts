@@ -4,6 +4,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  ViewChild
 } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { LocalStorageService } from "angular-web-storage";
@@ -13,13 +14,22 @@ import { CommonFunction } from "src/app/service/common-function.service";
 import { DataService } from "src/app/service/data.service";
 import { IframilyService } from "src/app/service/iframily.service";
 import { TodoService } from "src/app/service/todo.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { TodoWidgetFormatComponent } from "../todo-widget-format/todo-widget-format.component";
 
 @Component({
   selector: "app-todo",
   templateUrl: "./todo.component.html",
-  styleUrls: ["./todo.component.scss"],
+  styleUrls: ["./todo.component.scss"]
 })
 export class TodoComponent implements OnInit, OnChanges {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
+  @ViewChild(TodoWidgetFormatComponent, { static: false })
+  todoWidgetFormatComponent: TodoWidgetFormatComponent;
+
   @Input() todoWidgetObject: any;
   @Input() todoSettingModal: any;
   @Input() activeLayout: any;
@@ -52,7 +62,8 @@ export class TodoComponent implements OnInit, OnChanges {
     private storage: LocalStorageService,
     private _iframily: IframilyService,
     private formBuilder: FormBuilder,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnChanges(changes: any) {
@@ -67,12 +78,12 @@ export class TodoComponent implements OnInit, OnChanges {
         let payload = {
           userMirrorModel: {
             mirror: {
-              id: this.todoTaskCredentials.mirrorDetails.mirror.id,
+              id: this.todoTaskCredentials.mirrorDetails.mirror.id
             },
-            userRole: this.todoTaskCredentials.mirrorDetails.userRole,
+            userRole: this.todoTaskCredentials.mirrorDetails.userRole
           },
           widgetSettingId: this.todoWidgetObject.widgetSettingId,
-          authorizationCode: this.todoTaskCredentials.code,
+          authorizationCode: this.todoTaskCredentials.code
         };
         this.updateGoogleCredential(payload);
       }
@@ -83,12 +94,12 @@ export class TodoComponent implements OnInit, OnChanges {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.todoTaskCredentials.mirrorDetails.mirror.id,
+            id: this.todoTaskCredentials.mirrorDetails.mirror.id
           },
-          userRole: this.todoTaskCredentials.mirrorDetails.userRole,
+          userRole: this.todoTaskCredentials.mirrorDetails.userRole
         },
         widgetSettingId: this.todoWidgetObject.widgetSettingId,
-        authorizationCode: this.todoTaskCredentials.code,
+        authorizationCode: this.todoTaskCredentials.code
       };
       this.updateOutlookCredential(payload);
     } else if (
@@ -98,12 +109,12 @@ export class TodoComponent implements OnInit, OnChanges {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.todoTaskCredentials.mirrorDetails.mirror.id,
+            id: this.todoTaskCredentials.mirrorDetails.mirror.id
           },
-          userRole: this.todoTaskCredentials.mirrorDetails.userRole,
+          userRole: this.todoTaskCredentials.mirrorDetails.userRole
         },
         widgetSettingId: this.todoWidgetObject.widgetSettingId,
-        authorizationCode: this.todoTaskCredentials.code,
+        authorizationCode: this.todoTaskCredentials.code
       };
       this.updateTodoistCredential(payload);
     }
@@ -131,6 +142,13 @@ export class TodoComponent implements OnInit, OnChanges {
       this.isAnySourceAdded = true;
     }
     this.previouslyAddedProjects = todoWidgetObject.data.selected_project;
+
+    const previousTodosIds = [...this.previouslyAddedProjects].map(
+      (chore) => chore.id
+    );
+
+    this.widgetDataService.widgetFormState[this.category].todos.initialValue =
+      previousTodosIds;
   }
 
   saveTodoSettings() {
@@ -140,11 +158,12 @@ export class TodoComponent implements OnInit, OnChanges {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id,
+        id: this.activeMirrorDetails.id
       },
       widgetSettingId: this.todoWidgetObject.widgetSettingId,
-      selectedTodoProject: this.previouslyAddedProjects,
+      selectedTodoProject: this.previouslyAddedProjects
     };
+    console.log(this.previouslyAddedProjects);
     this.loadingSpinner.show();
     this._todoService.updateSelectedProject(payload).subscribe(
       (res: any) => {
@@ -170,22 +189,71 @@ export class TodoComponent implements OnInit, OnChanges {
     );
   }
 
-  onbgsettingOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      {
+        ...this.todoWidgetFormatComponent.todoFormatFormGroup.value,
+        ...this.todoWidgetFormatComponent.getTodoSettingsAdditionalProps()
+      }
+    );
+
+    if (isSettingsFormChanged) {
+      this.todoWidgetFormatComponent.todoWidgetFormatUpdate();
+      settingsForm.initialValue =
+        this.todoWidgetFormatComponent.todoFormatFormGroup.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    // Checks if need to save todos form/tab
+    const initialTodosIds =
+      this.widgetDataService.widgetFormState[this.category].todos.initialValue;
+    const initialTodosIdsSet = new Set(initialTodosIds);
+    const currentTodosIdsSet = new Set(
+      this.previouslyAddedProjects.map((todo) => todo.id)
+    );
+
+    const isSame =
+      initialTodosIdsSet.size === currentTodosIdsSet.size &&
+      initialTodosIds.every((item) => currentTodosIdsSet.has(item));
+
+    if (!isSame) {
+      this.saveTodoSettings();
+    }
+
+    this.todoSettingModal.hide();
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event) {
+    this.newBgSetting = event;
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.todoWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
       calenderBgPayload
     );
-    this.todoSettingModal.hide();
   }
 
   changeSelectedProjectStatus(
@@ -207,7 +275,7 @@ export class TodoComponent implements OnInit, OnChanges {
         forgroundColor: requestObject.forgroundColor,
         todoAccountId: requestObject.todoAccountId,
         etag: requestObject.etag,
-        projectName: requestObject.projectName,
+        projectName: requestObject.projectName
       };
       this.previouslyAddedProjects.push(customData);
     }
@@ -314,6 +382,12 @@ export class TodoComponent implements OnInit, OnChanges {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -366,7 +440,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "google",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject,
+          projectList: res.object.selectedTodoProject
         };
 
         this.accountList.push(data);
@@ -436,7 +510,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "outlook",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject,
+          projectList: res.object.selectedTodoProject
         };
 
         this.accountList.push(data);
@@ -507,7 +581,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "todoist",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject,
+          projectList: res.object.selectedTodoProject
         };
 
         this.accountList.push(data);
