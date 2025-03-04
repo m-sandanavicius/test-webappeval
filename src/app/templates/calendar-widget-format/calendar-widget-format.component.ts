@@ -10,6 +10,7 @@ import { LocalStorageService } from "angular-web-storage";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { ToastrService } from "ngx-toastr";
 import { DataService } from "src/app/service/data.service";
+import { WidgetDataService } from "src/app/service/widget-data.service";
 import { WidgetService } from "src/app/service/widget.service";
 import {
   schedule_daysToShow,
@@ -18,13 +19,13 @@ import {
   calendar_monthview_selectedMonth,
   calendar_monthview_dateSize,
   text_alignment,
-  calendar_wrap_option,
+  calendar_wrap_option
 } from "src/app/util/static-data";
 
 @Component({
   selector: "app-calendar-widget-format",
   templateUrl: "./calendar-widget-format.component.html",
-  styleUrls: ["./calendar-widget-format.component.scss"],
+  styleUrls: ["./calendar-widget-format.component.scss"]
 })
 export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
   @Output() closeModalEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -70,13 +71,13 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
   selected_plan: any;
   week_time_slot_selection = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22, 23,
+    21, 22, 23
   ];
   week_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   eventRangeSelection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   dayRangeSelection = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30,
+    22, 23, 24, 25, 26, 27, 28, 29, 30
   ];
 
   calendarToggle: boolean = false;
@@ -108,7 +109,7 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
     isPastEventEnabled: true,
     isConcatEnabled: false,
     list_no_days: 5,
-    isInprogressEventEnabled: true,
+    isInprogressEventEnabled: true
   };
   default_w_weeksToShow: number = 2;
 
@@ -118,7 +119,8 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
     private storage: LocalStorageService,
     private _dataService: DataService,
     private toastr: ToastrService,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {
     this.selected_plan = "current_week";
   }
@@ -199,36 +201,36 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
       this.calendarFormatFormGroup = this.formBuilder.group({
         showLocation: [
           calendarFormatData ? calendarFormatData.showLocation : true,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
         showEndDate: [
           calendarFormatData ? calendarFormatData.showEndDate : false,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
         numberOfEvent: [
           calendarFormatData.numberOfEvent
             ? calendarFormatData.numberOfEvent
             : 5,
-          Validators.required,
+          Validators.required
         ],
 
         list_no_days: [
           calendarFormatData.list_no_days ? calendarFormatData.list_no_days : 5,
-          Validators.required,
+          Validators.required
         ],
 
         isConcatEnabled: [
           calendarFormatData.isConcatEnabled
             ? calendarFormatData.isConcatEnabled
             : false,
-          Validators.required,
+          Validators.required
         ],
 
         list_event_type: [
           calendarFormatData.list_event_type
             ? calendarFormatData.list_event_type
             : "Tomorrow",
-          Validators.required,
+          Validators.required
         ],
 
         // schedule
@@ -236,23 +238,23 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
           calendarFormatData
             ? calendarFormatData.schedule_days_selection
             : "current_week",
-          Validators.required,
+          Validators.required
         ],
         day_start_time: [
           calendarFormatData ? calendarFormatData.day_start_time : 9,
-          Validators.required,
+          Validators.required
         ],
         day_end_time: [
           calendarFormatData ? calendarFormatData.day_end_time : 17,
-          Validators.required,
+          Validators.required
         ],
         showWeekDaysOnly: [
           calendarFormatData ? calendarFormatData.showWeekDaysOnly : false,
-          Validators.required,
+          Validators.required
         ],
         schedule_title: [
           calendarFormatData ? calendarFormatData.schedule_title : true,
-          Validators.required,
+          Validators.required
         ],
 
         // week month
@@ -260,29 +262,29 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
           calendarFormatData
             ? calendarFormatData.w_weeksToShow
             : this.default_w_weeksToShow,
-          Validators.required,
+          Validators.required
         ],
         m_weeksToShow: [
           calendarFormatData ? calendarFormatData.m_weeksToShow : 1,
-          Validators.required,
+          Validators.required
         ],
         m_selectedMonth: [
           calendarFormatData ? calendarFormatData.m_selectedMonth : 0,
-          Validators.required,
+          Validators.required
         ],
         word_wrap: [
           calendarFormatData ? calendarFormatData.word_wrap : false,
-          Validators.required,
+          Validators.required
         ],
         isPastEventEnabled: [
           calendarFormatData ? calendarFormatData.isPastEventEnabled : true,
-          Validators.required,
+          Validators.required
         ],
         isInprogressEventEnabled: [
           calendarFormatData
             ? calendarFormatData.isInprogressEventEnabled
             : true,
-          Validators.required,
+          Validators.required
         ],
         // m_date_fontsize: [
         //   calendarFormatData ? calendarFormatData.m_date_fontsize : "small",
@@ -290,25 +292,49 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
         // ],
         showLegends: [
           calendarFormatData ? calendarFormatData.showLegends : false,
-          Validators.required,
-        ],
+          Validators.required
+        ]
         // m_date_allignment: [
         //   calendarFormatData ? calendarFormatData.m_date_allignment : "right",
         //   Validators.required,
         // ],
       });
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].settings.initialValue = {
+        ...this.calendarFormatFormGroup.value,
+        ...this.getCalendarSettingsAdditionalProps()
+      };
     }
+  }
+
+  getCalendarSettingsAdditionalProps() {
+    return {
+      calendarType: this.calendarType,
+      image_size: this.image_size,
+      m_date_allignment: this.m_date_allignment,
+      m_date_fontsize: this.m_date_fontsize,
+      m_scroll: this.m_scroll,
+      scrolling: this.scrolling,
+      weekStartWith: this.weekStartWith,
+      id: this.calendarCurrentFormatSetting.id || null
+    };
   }
 
   dismissModel() {
     this.closeModalEvent.emit(true);
   }
 
+  onCalendarSettingsSave(): void {
+    this.updateWidgetStatusEventEmiter.emit();
+  }
+
   oncalendarFormatEmit() {
     let payload = {
       userMirrorId: this.activeMirrorDetail.id,
       calendarWidgetFormattingModel: this.calendarFormatFormGroup.value,
-      widgetSettingId: this.calendarWidgetObject.widgetSettingId,
+      widgetSettingId: this.calendarWidgetObject.widgetSettingId
     };
     delete payload.calendarWidgetFormattingModel.upNextSetting;
 

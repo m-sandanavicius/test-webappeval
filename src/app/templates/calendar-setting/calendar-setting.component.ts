@@ -6,7 +6,7 @@ import {
   EventEmitter,
   OnChanges,
   ViewChild,
-  ElementRef,
+  ElementRef
 } from "@angular/core";
 import { WidgetService } from "src/app/service/widget.service";
 import { LocalStorageService } from "angular-web-storage";
@@ -21,12 +21,14 @@ import { SubscriptionUtil } from "src/app/util/subscriptionUtil";
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { CalendarService } from "src/app/service/calendar.service";
 import { MangoMirrorConstants } from "src/app/util/constants";
-import { timeout } from "rxjs/operators";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { CalendarWidgetFormatComponent } from "../calendar-widget-format/calendar-widget-format.component";
 
 @Component({
   selector: "app-calendar-setting",
   templateUrl: "./calendar-setting.component.html",
-  styleUrls: ["./calendar-setting.component.scss"],
+  styleUrls: ["./calendar-setting.component.scss"]
 })
 export class CalendarSettingComponent implements OnInit, OnChanges {
   @ViewChild("calendarQuantityAlert", { static: true })
@@ -39,6 +41,12 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
   icsCalendarAlertModal: ModalDirective;
 
   @ViewChild("myIdentifier", { static: false }) divHello: ElementRef;
+
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
+  @ViewChild(CalendarWidgetFormatComponent, { static: false })
+  calendarWidgetFormatComponent: CalendarWidgetFormatComponent;
 
   @Input() calendarSettingModal: any;
   @Input() category: string;
@@ -103,7 +111,8 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     private route: Router,
     private _paymentService: StripePaymentService,
     private subscriptionUtil: SubscriptionUtil,
-    private _calendarService: CalendarService
+    private _calendarService: CalendarService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnInit() {
@@ -123,6 +132,14 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     this.setDisplayflag();
     this.accountList = calendarWidget.data.addedCalendarAccount;
     this.previouslyAddedCalendars = calendarWidget.data.selectedCalendar;
+
+    const previousCalendarsIds = [...this.previouslyAddedCalendars].map(
+      (calendar) => calendar.id
+    );
+
+    this.widgetDataService.widgetFormState[
+      this.category
+    ].calendars.initialValue = previousCalendarsIds;
 
     if (this.accountList.length > 0) {
       this.isAnySourceAdded = true;
@@ -275,7 +292,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
         isCustomEtag:
           requestObject.isCustomEtag == null
             ? false
-            : requestObject.isCustomEtag,
+            : requestObject.isCustomEtag
       };
 
       if (
@@ -324,12 +341,12 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
         let payload = {
           userMirrorModel: {
             mirror: {
-              id: this.userCredentials.mirrorDetails.mirror.id,
+              id: this.userCredentials.mirrorDetails.mirror.id
             },
-            userRole: this.userCredentials.mirrorDetails.userRole,
+            userRole: this.userCredentials.mirrorDetails.userRole
           },
           widgetSettingId: this.calendarWidgetObject.widgetSettingId,
-          authorizationCode: this.userCredentials.code,
+          authorizationCode: this.userCredentials.code
         };
         this.updateGoogleCalendarCredentials(payload);
       }
@@ -340,12 +357,12 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.userCredentials.mirrorDetails.mirror.id,
+            id: this.userCredentials.mirrorDetails.mirror.id
           },
-          userRole: this.userCredentials.mirrorDetails.userRole,
+          userRole: this.userCredentials.mirrorDetails.userRole
         },
         widgetSettingId: this.calendarWidgetObject.widgetSettingId,
-        authorizationCode: this.userCredentials.code,
+        authorizationCode: this.userCredentials.code
       };
       this.updateOutlookCalendarCredentials(payload);
     }
@@ -358,6 +375,12 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
           this.widgetSettings = data.widgetSetting;
           this.widgetBgSetting =
             changes.calendarWidgetObject.currentValue.widgetBackgroundSettingModel;
+
+          this.widgetDataService.widgetFormState[
+            this.category
+          ].format.initialValue = {
+            ...this.widgetBgSetting
+          };
         });
         this.calendarWidgetFormat =
           this.calendarWidgetObject.data.calendarwidgetformat;
@@ -379,7 +402,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
         "com.chakra.mangomirror.us.monthly",
         "com.chakra.mangomirror.us.yearly",
         "plus_yearly",
-        "plus_monthly",
+        "plus_monthly"
       ].includes(subscriptionData.productId);
   }
 
@@ -404,6 +427,12 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -420,7 +449,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
           calendarType: "google",
           sourceAccount: res.object.userCalendarAccountModel.sourceAccount,
           isWriteAccess: false,
-          calendarList: res.object.selectedCalendar,
+          calendarList: res.object.selectedCalendar
         };
         this.accountList.push(data);
 
@@ -503,7 +532,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
                       ...currentSelectedObject,
                       backgroundColor: matchedObject.backgroundColor, // Update specific property
                       forgroundColor: matchedObject.forgroundColor, // Update specific property
-                      calendarName: matchedObject.calendarName, // Update specific property
+                      calendarName: matchedObject.calendarName // Update specific property
                     };
                   }
 
@@ -576,11 +605,6 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     this.settingDisplayflag = true;
   }
 
-  onbgsettingOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
-  }
-
   backToCalendar() {
     this.isFamilyCalendarSeleted = false;
   }
@@ -596,10 +620,10 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id,
+        id: this.activeMirrorDetails.id
       },
       widgetSettingId: this.calendarWidgetObject.widgetSettingId,
-      selectedCalendar: this.previouslyAddedCalendars,
+      selectedCalendar: this.previouslyAddedCalendars
     };
     this.loadingSpinner.show();
     this._calendarService.updateCalendarList(payload).subscribe(
@@ -633,11 +657,70 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     }
   }
 
-  onAddBackgroundSetting() {
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      {
+        ...this.calendarWidgetFormatComponent.calendarFormatFormGroup.value,
+        ...this.calendarWidgetFormatComponent.getCalendarSettingsAdditionalProps()
+      }
+    );
+
+    if (isSettingsFormChanged) {
+      console.log("saving calendar settings...");
+      this.calendarWidgetFormatComponent.oncalendarFormatEmit();
+      settingsForm.initialValue =
+        this.calendarWidgetFormatComponent.calendarFormatFormGroup.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      console.log("saving calendar format...");
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    // Checks if need to save calendars form/tab
+    const initialCalendarsIds =
+      this.widgetDataService.widgetFormState[this.category].calendars
+        .initialValue;
+    const initialCalendarsIdsSet = new Set(initialCalendarsIds);
+    const currentCalendarsIdsSet = new Set(
+      this.previouslyAddedCalendars.map((calendar) => calendar.id)
+    );
+
+    const isSame =
+      initialCalendarsIdsSet.size === currentCalendarsIdsSet.size &&
+      initialCalendarsIds.every((item) => currentCalendarsIdsSet.has(item));
+
+    if (!isSame) {
+      console.log("saving calendars form...");
+      this.saveCalendarSettings();
+    }
+
+    this.calendarSettingModal.hide();
+  }
+
+  saveBackgroundSettings(event) {
+    this.newBgSetting = event;
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.calenderWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -819,7 +902,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
 
   saveFamilyCalendar() {
     let widgetsettingObject = {
-      id: this.calendarWidgetObject.widgetSettingId,
+      id: this.calendarWidgetObject.widgetSettingId
     };
 
     this.currentFamilyCalendar.customBackgroundColor = this.backgroundColor;
@@ -832,7 +915,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     let payload = {
       userMirrorId: this.activeMirrorDetails.id,
       widgetSettingId: this.calendarWidgetObject.widgetSettingId,
-      selectedCalendarModel: this.currentFamilyCalendar,
+      selectedCalendarModel: this.currentFamilyCalendar
     };
 
     this.loadingSpinner.show();
@@ -869,7 +952,7 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
           calendarType: "outlook",
           isWriteAccess: false,
           sourceAccount: res.object.userCalendarAccountModel.sourceAccount,
-          calendarList: res.object.selectedCalendar,
+          calendarList: res.object.selectedCalendar
         };
         this.accountList.push(data);
 

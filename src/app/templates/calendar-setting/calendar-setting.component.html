@@ -666,7 +666,8 @@
                   </button>
                   <button
                     class="btn btn-primary"
-                    (click)="saveCalendarSettings()"
+                    type="button"
+                    (click)="save()"
                   >
                     SAVE
                   </button>
@@ -682,7 +683,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingCalenderOptions)="onbgsettingOptions($event)"
+              (emitbgsettingCalenderOptions)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>
@@ -695,9 +696,7 @@
             <app-calendar-widget-format
               [category]="category"
               (closeModalEvent)="dismissModel()"
-              (updateWidgetStatusEventEmiter)="
-                updatecalendarWidgetStatus($event)
-              "
+              (updateWidgetStatusEventEmiter)="save()"
               [activeLayout]="activeLayout"
               [calendarWidgetObject]="calendarWidgetObject"
             >
