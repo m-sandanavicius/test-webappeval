@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { LocalStorageService } from "angular-web-storage";
 import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
@@ -8,13 +8,22 @@ import { CommonFunction } from "src/app/service/common-function.service";
 import { DataService } from "src/app/service/data.service";
 import { IframilyService } from "src/app/service/iframily.service";
 import { TodoService } from "src/app/service/todo.service";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
+import { ChoresWidgetFormatComponent } from "../chores-widget-format/chores-widget-format.component";
 
 @Component({
   selector: "app-chores",
   templateUrl: "./chores.component.html",
-  styleUrls: ["./chores.component.scss"],
+  styleUrls: ["./chores.component.scss"]
 })
 export class ChoresComponent implements OnInit {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
+  @ViewChild(ChoresWidgetFormatComponent, { static: false })
+  choresWidgetFormatComponent: ChoresWidgetFormatComponent;
+
   @Input() choresWidgetObject: any;
   @Input() choresSettingModal: any;
   @Input() activeLayout: any;
@@ -46,7 +55,8 @@ export class ChoresComponent implements OnInit {
     private commonFunction: CommonFunction,
     private storage: LocalStorageService,
     private loadingSpinner: Ng4LoadingSpinnerService,
-    private _customSortPipe: CustomSortPipe
+    private _customSortPipe: CustomSortPipe,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnChanges(changes: any) {
@@ -57,13 +67,13 @@ export class ChoresComponent implements OnInit {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.choresTaskCredentials.mirrorDetails.mirror.id,
+            id: this.choresTaskCredentials.mirrorDetails.mirror.id
           },
-          userRole: this.choresTaskCredentials.mirrorDetails.userRole,
+          userRole: this.choresTaskCredentials.mirrorDetails.userRole
         },
         widgetSettingId: this.choresWidgetObject.widgetSettingId,
         authorizationCode: this.choresTaskCredentials.code,
-        type: "chores",
+        type: "chores"
       };
       this.updateTodoistCredential(payload);
     }
@@ -104,6 +114,13 @@ export class ChoresComponent implements OnInit {
       element["labelList"] = [{ color: "", labelName: "", orderNumber: 1 }];
     });
     this.previouslyAddedProjects = choresWidgetObject.data.selected_labels;
+
+    const previousChoresIds = [...this.previouslyAddedProjects].map(
+      (chore) => chore.id
+    );
+
+    this.widgetDataService.widgetFormState[this.category].chores.initialValue =
+      previousChoresIds;
   }
 
   saveChoresSettings() {
@@ -113,10 +130,10 @@ export class ChoresComponent implements OnInit {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id,
+        id: this.activeMirrorDetails.id
       },
       widgetSettingId: this.choresWidgetObject.widgetSettingId,
-      selectedTodoLabel: this.previouslyAddedProjects,
+      selectedTodoLabel: this.previouslyAddedProjects
     };
     this.loadingSpinner.show();
     this._todoService.updateSelectedLabels(payload).subscribe(
@@ -144,16 +161,66 @@ export class ChoresComponent implements OnInit {
     );
   }
 
-  onbgsettingOptions(event) {
-    this.newBgSetting = event;
-    this.onAddBackgroundSetting();
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      {
+        ...this.choresWidgetFormatComponent.todoFormatFormGroup.value,
+        ...this.choresWidgetFormatComponent.getChoresSettingsAdditionalProps()
+      }
+    );
+
+    if (isSettingsFormChanged) {
+      this.choresWidgetFormatComponent.todoWidgetFormatUpdate();
+      settingsForm.initialValue =
+        this.choresWidgetFormatComponent.todoFormatFormGroup.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    // Checks if need to save calendars form/tab
+    const initialChoresIds =
+      this.widgetDataService.widgetFormState[this.category].chores.initialValue;
+    const initialChoresIdsSet = new Set(initialChoresIds);
+    const currentChoresIdsSet = new Set(
+      this.previouslyAddedProjects.map((chore) => chore.id)
+    );
+
+    const isSame =
+      initialChoresIdsSet.size === currentChoresIdsSet.size &&
+      initialChoresIds.every((item) => currentChoresIdsSet.has(item));
+
+    if (!isSame) {
+      this.saveChoresSettings();
+    }
+
+    this.choresSettingModal.hide();
   }
 
-  onAddBackgroundSetting() {
+  saveBackgroundSettings(event): void {
+    this.newBgSetting = event;
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.choresWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -180,7 +247,7 @@ export class ChoresComponent implements OnInit {
         color: requestObject.color,
         todoAccountId: requestObject.todoAccountId,
         labelName: requestObject.labelName,
-        orderNumber: requestObject.orderNumber,
+        orderNumber: requestObject.orderNumber
       };
       this.previouslyAddedProjects.push(customData);
     }
@@ -250,7 +317,7 @@ export class ChoresComponent implements OnInit {
     let payload = {
       todoAccountDetailModel: accountDetails,
       widgetSettingId: this.choresWidgetObject.widgetSettingId,
-      type: "chores",
+      type: "chores"
     };
     this.loadingSpinner.show();
     this._todoService.getLatestTodoLabels(payload).subscribe(
@@ -314,6 +381,12 @@ export class ChoresComponent implements OnInit {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
   }
@@ -369,7 +442,7 @@ export class ChoresComponent implements OnInit {
           accountType: "todoist",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
           labelList: res.object.selectedLabels,
-          projectList: res.object.selectedTodoProject,
+          projectList: res.object.selectedTodoProject
         };
 
         this.accountList.push(data);

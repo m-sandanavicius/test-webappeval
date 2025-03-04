@@ -5,17 +5,20 @@ import { Ng4LoadingSpinnerService } from "ng4-loading-spinner";
 import { ToastrService } from "ngx-toastr";
 import { DataService } from "src/app/service/data.service";
 import { TodoService } from "src/app/service/todo.service";
+import { WidgetDataService } from "src/app/service/widget-data.service";
 
 @Component({
   selector: "app-chores-widget-format",
   templateUrl: "./chores-widget-format.component.html",
-  styleUrls: ["./chores-widget-format.component.scss"],
+  styleUrls: ["./chores-widget-format.component.scss"]
 })
 export class ChoresWidgetFormatComponent implements OnInit {
   @Output() closeChoresModalEvent: EventEmitter<any> = new EventEmitter<any>();
   @Input() activeLayout: any;
   @Input() category: string;
   @Input() todoWidgetObject: any;
+
+  @Output() updateWidgetStatusEventEmiter = new EventEmitter<any>();
 
   todoFormatData: any;
   todoFormatFormGroup: FormGroup;
@@ -36,7 +39,7 @@ export class ChoresWidgetFormatComponent implements OnInit {
   eventRangeSelection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   dayRangeSelection = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30,
+    22, 23, 24, 25, 26, 27, 28, 29, 30
   ];
 
   calendarToggle: boolean = false;
@@ -49,7 +52,7 @@ export class ChoresWidgetFormatComponent implements OnInit {
     isPastEventEnabled: true,
     numberOfDays: 5,
     isOverDueTaskVisible: true,
-    isTaskAutoComplete: true,
+    isTaskAutoComplete: true
   };
 
   constructor(
@@ -58,7 +61,8 @@ export class ChoresWidgetFormatComponent implements OnInit {
     private storage: LocalStorageService,
     private _dataService: DataService,
     private toastr: ToastrService,
-    private loadingSpinner: Ng4LoadingSpinnerService
+    private loadingSpinner: Ng4LoadingSpinnerService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnChanges(changes: any) {
@@ -97,49 +101,56 @@ export class ChoresWidgetFormatComponent implements OnInit {
       this.todoFormatFormGroup = this.formBuilder.group({
         showEndDate: [
           todoFormatData ? todoFormatData.showEndDate : false,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
 
         taskEditEnable: [
           todoFormatData ? todoFormatData.taskEditEnable : false,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
 
         showCompletedTask: [
           todoFormatData ? todoFormatData.showCompletedTask : false,
-          Validators.requiredTrue,
+          Validators.requiredTrue
         ],
 
         numberOfEvent: [
           todoFormatData.numberOfEvent ? todoFormatData.numberOfEvent : 5,
-          Validators.required,
+          Validators.required
         ],
 
         numberOfDays: [
           todoFormatData.numberOfDays ? todoFormatData.numberOfDays : 5,
-          Validators.required,
+          Validators.required
         ],
 
         task_duration: [
           todoFormatData.task_duration ? todoFormatData.task_duration : "Today",
-          Validators.required,
+          Validators.required
         ],
 
         isPastEventEnabled: [
           todoFormatData ? todoFormatData.isPastEventEnabled : true,
-          Validators.required,
+          Validators.required
         ],
 
         isOverDueTaskVisible: [
           todoFormatData ? todoFormatData.isOverDueTaskVisible : false,
-          Validators.required,
+          Validators.required
         ],
 
         isTaskAutoComplete: [
           todoFormatData ? todoFormatData.isTaskAutoComplete : false,
-          Validators.required,
-        ],
+          Validators.required
+        ]
       });
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].settings.initialValue = {
+        ...this.todoFormatFormGroup.value,
+        ...this.getChoresSettingsAdditionalProps()
+      };
     }
   }
 
@@ -175,11 +186,22 @@ export class ChoresWidgetFormatComponent implements OnInit {
       this.todoFormatFormGroup.controls["task_duration"].value == "Today";
   }
 
+  onChoresSettingsSave(): void {
+    this.updateWidgetStatusEventEmiter.emit();
+  }
+
+  getChoresSettingsAdditionalProps() {
+    return {
+      scrolling: this.scrolling,
+      id: this.todoCurrentFormatSetting.id || null
+    };
+  }
+
   todoWidgetFormatUpdate() {
     let payload = {
       userMirrorId: this.activeMirrorDetail.id,
       todoWidgetSettingModel: this.todoFormatFormGroup.value,
-      widgetSettingId: this.todoWidgetObject.widgetSettingId,
+      widgetSettingId: this.todoWidgetObject.widgetSettingId
     };
 
     if (this.todoCurrentFormatSetting != undefined) {

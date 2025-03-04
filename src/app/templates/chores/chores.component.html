@@ -247,7 +247,8 @@
                   </button>
                   <button
                     class="btn btn-primary"
-                    (click)="saveChoresSettings()"
+                    type="button"
+                    (click)="save()"
                   >
                     SAVE
                   </button>
@@ -262,6 +263,7 @@
           >
             <app-chores-widget-format
               (closeChoresModalEvent)="dismissModel()"
+              (updateWidgetStatusEventEmiter)="save()"
               [category]="category"
               [activeLayout]="activeLayout"
               [todoWidgetObject]="choresWidgetObject"
@@ -276,7 +278,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingChores)="onbgsettingOptions($event)"
+              (emitbgsettingChores)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>

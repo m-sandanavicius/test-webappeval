@@ -65,6 +65,17 @@ export class WidgetDataService {
       format: {
         initialValue: {}
       }
+    },
+    chores: {
+      chores: {
+        initialValue: {}
+      },
+      settings: {
+        initialValue: {}
+      },
+      format: {
+        initialValue: {}
+      }
     }
   };
 
