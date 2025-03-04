@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from "@angular/core";
+import { Component, Input, OnChanges, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { NgbDateStruct, NgbTimeStruct } from "@ng-bootstrap/ng-bootstrap";
 import { LocalStorageService } from "angular-web-storage";
@@ -7,15 +7,18 @@ import { ToastrService } from "ngx-toastr";
 import { CommonFunction } from "src/app/service/common-function.service";
 import { CountDownService } from "src/app/service/count-down.service";
 import { DataService } from "src/app/service/data.service";
-import { ImageWidgetService } from "src/app/service/image-widget.service";
-import { WidgetService } from "src/app/service/widget.service";
+import { WidgetDataService } from "src/app/service/widget-data.service";
+import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting.component";
 
 @Component({
   selector: "app-count-down-widget",
   templateUrl: "./count-down-widget.component.html",
-  styleUrls: ["./count-down-widget.component.scss"],
+  styleUrls: ["./count-down-widget.component.scss"]
 })
 export class CountDownWidgetComponent implements OnInit, OnChanges {
+  @ViewChild(WidgetBgSettingComponent, { static: false })
+  widgetBgSettingComponent: WidgetBgSettingComponent;
+
   @Input() countDownWidget: any;
   @Input() countDownSettingModal: any;
   @Input() activeLayout: any;
@@ -41,13 +44,13 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
 
   constructor(
     private formBuilder: FormBuilder,
-    private widgetService: WidgetService,
     private storage: LocalStorageService,
     private loadingSpinner: Ng4LoadingSpinnerService,
     private toastr: ToastrService,
     private _dataService: DataService,
     private commonFunction: CommonFunction,
-    private _countDownService: CountDownService
+    private _countDownService: CountDownService,
+    private widgetDataService: WidgetDataService
   ) {}
 
   ngOnInit() {
@@ -85,50 +88,85 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
     this.countDownFormGroup = this.formBuilder.group({
       eventName: [
         countDownWidget ? countDownWidget.eventName : "",
-        Validators.required,
+        Validators.required
       ],
       eventTime: [
         countDownWidget ? countDownWidget.eventTime : currentDateTime,
-        Validators.required,
+        Validators.required
       ],
       isDayEnabled: [
         countDownWidget ? countDownWidget.isDayEnabled : true,
-        Validators.requiredTrue,
+        Validators.requiredTrue
       ],
       isHourEnabled: [
         countDownWidget ? countDownWidget.isHourEnabled : true,
-        Validators.requiredTrue,
+        Validators.requiredTrue
       ],
       isMinuteEnabled: [
         countDownWidget ? countDownWidget.isMinuteEnabled : true,
-        Validators.requiredTrue,
+        Validators.requiredTrue
       ],
       isSecondEnabled: [
         countDownWidget ? countDownWidget.isSecondEnabled : true,
-        Validators.requiredTrue,
-      ],
+        Validators.requiredTrue
+      ]
     });
+
+    this.widgetDataService.widgetFormState[
+      this.category
+    ].settings.initialValue = {
+      ...this.countDownFormGroup.value
+    };
   }
 
-  onbgsettingOptions(event) {
+  save(): void {
+    // Checks if need to save settings form
+    const settingsForm =
+      this.widgetDataService.widgetFormState[this.category].settings;
+
+    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
+      settingsForm.initialValue,
+      this.countDownFormGroup.value
+    );
+
+    if (isSettingsFormChanged) {
+      this.saveCountDownSetting();
+      settingsForm.initialValue = this.countDownFormGroup.value;
+    }
+
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+      formatForm.initialValue,
+      this.widgetBgSettingComponent.bgSettingOptions
+    );
+
+    if (isFormatFormChanged) {
+      this.saveBackgroundSettings(
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+      formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    }
+
+    this.countDownSettingModal.hide();
+  }
+
+  saveBackgroundSettings(event) {
     this.newBgSetting = event;
-    this.onAddBackgroundSetting();
-  }
-
-  onAddBackgroundSetting() {
     const imageBgPayload = {
       userMirrorId: this.activeMirrorDetail.id,
       mastercategory: [this.countDownWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting,
+      widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(this.newBgSetting, imageBgPayload);
-    this.countDownSettingModal.hide();
   }
 
   saveCountDownSetting() {
     let payload = this.countDownFormGroup.value;
     payload["widgetSetting"] = {
-      id: this.countDownWidget.widgetSettingId,
+      id: this.countDownWidget.widgetSettingId
     };
     payload["id"] = this.countDownWidgetData.id;
 
@@ -153,7 +191,6 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
         this.widgetLayoutDetails.widgetSetting = this.widgetSettings;
         this.storage.set("activeWidgetDetails", this.widgetLayoutDetails);
         this._dataService.setWidgetSettingsLayout(this.widgetLayoutDetails);
-        this.countDownSettingModal.hide();
       },
       (err: any) => {
         this.loadingSpinner.hide();
@@ -167,6 +204,12 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
+      this.widgetDataService.widgetFormState[
+        this.category
+      ].format.initialValue = {
+        ...this.widgetBgSetting
+      };
     }
     this.activeMirrorDetail = this.storage.get("activeMirrorDetails");
   }

@@ -226,10 +226,7 @@
                 >
                   CANCEL
                 </button>
-                <button
-                  class="btn btn-primary"
-                  (click)="saveCountDownSetting()"
-                >
+                <button class="btn btn-primary" type="button" (click)="save()">
                   SAVE
                 </button>
               </div>
@@ -243,7 +240,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingCountDown)="onbgsettingOptions($event)"
+              (emitbgsettingCountDown)="save()"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>
