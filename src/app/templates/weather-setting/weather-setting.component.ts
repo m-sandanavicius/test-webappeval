@@ -77,6 +77,7 @@ export class WeatherSettingComponent
 
   fg: FormGroup;
   WeatherType = WeatherType;
+  initialAddress: string;
 
   constructor(
     private _weatherService: WeatherService,
@@ -94,7 +95,6 @@ export class WeatherSettingComponent
 
   ngOnInit() {
     this.fg = this.formBuilder.group({
-      address: [],
       weatherType: [],
       temperatureUnit: [""]
     });
@@ -177,10 +177,10 @@ export class WeatherSettingComponent
 
   setBackgroundWidgetDetail() {
     this.widgetType = this.category;
-    console.log(this.category);
     let widgetData = this.storage.get("selectedwidget");
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
+
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
@@ -195,23 +195,16 @@ export class WeatherSettingComponent
       changes.weatherWidgetObject &&
       changes.weatherWidgetObject.currentValue != undefined
     ) {
-      console.log("ngOnChanges executed");
-      //       address: [],
-      // weatherType: [],
-      // temperatureUnit: []
-
       this._dataService.getWidgetSettingsLayout().subscribe((data) => {
         this.widgetLayoutDetails = data;
-        console.log(this.widgetLayoutDetails);
         this.widgetSettings = data.widgetSetting;
       });
       let locationDetails =
         this.weatherWidgetObject.data.weatherWidgetDetail.location;
       if (locationDetails != null && locationDetails != undefined) {
         // this.storage.set("location", locationDetails);
-        this.fg.controls.address.setValue(locationDetails.locationName);
         this.address = locationDetails.locationName;
-        console.log(this.address);
+        this.initialAddress = locationDetails.locationName;
       }
       this.weatherWidgetData =
         this.weatherWidgetObject.data.weatherWidgetDetail;
@@ -222,7 +215,6 @@ export class WeatherSettingComponent
         "weatherType"
       ] = this.weatherWidgetObject.data.weatherWidgetDetail.weatherType;
 
-      console.log(this.widgetDataService.widgetFormState.weather.settings);
       this.fg.controls.weatherType.setValue(
         this.weatherWidgetObject.data.weatherWidgetDetail.weatherType
       );
@@ -231,8 +223,6 @@ export class WeatherSettingComponent
       this.widgetDataService.widgetFormState.weather.settings.initialValue = {
         ...this.fg.value
       };
-
-      console.log(this.fg.controls);
     }
     this.setBackgroundWidgetDetail();
     let userData = this.storage.get("userDetails");
@@ -286,9 +276,9 @@ export class WeatherSettingComponent
       settingsForm.initialValue,
       this.fg.value
     );
+    const { locationName } = this.storage.get("location");
 
-    if (isSettingsFormChanged) {
-      console.log("settins saving...");
+    if (isSettingsFormChanged || this.initialAddress !== locationName) {
       this.saveWeatherchanges();
       settingsForm.initialValue = this.fg.value;
     }
@@ -302,7 +292,6 @@ export class WeatherSettingComponent
     );
 
     if (isFormatFormChanged) {
-      console.log("saving format");
       this.saveBackgroundSettings(
         this.widgetBgSettingComponent.bgSettingOptions
       );
@@ -349,8 +338,6 @@ export class WeatherSettingComponent
       }
       payload["location"] = locationData;
     }
-    console.log(this.fg.controls);
-    console.log(payload);
     this.loadingSpinner.show();
     this._weatherService.updateWeatherSetting(payload).subscribe(
       (res: any) => {
@@ -387,16 +374,12 @@ export class WeatherSettingComponent
     );
   }
 
-  // saves onitself
   onUnitMeasureChanges(newUnit: string): void {
-    // console.log(newUnit);
     this.measureUnitData.temperatureUnit.activeUnit = newUnit;
     let payload: any = {
       temperatureUnit: this.measureUnitData.temperatureUnit.activeUnit
     };
     this.fg.get("temperatureUnit").setValue(newUnit);
-
-    console.log(this.fg.controls);
 
     this._profileService.updateUnitMeasuresAPI(payload).subscribe(
       (res: any) => {
@@ -411,17 +394,8 @@ export class WeatherSettingComponent
     );
   }
 
-  // maybe not needed
   setWeatherType(weatherType: string): void {
-    console.log(weatherType);
     this.fg.controls.weatherType.setValue(weatherType);
-    console.log(this.fg.controls.weatherType);
-  }
-
-  compare(option: any, value: any): boolean {
-    console.log(option);
-    console.log(value);
-    return option === value;
   }
 
   dismissModel() {
