@@ -181,9 +181,7 @@ export class WeatherSettingComponent
     if (widgetData != null) {
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
 
-      this.widgetDataService.widgetFormState[
-        this.category
-      ].format.initialValue = {
+      this.widgetDataService.widgetFormState["weather"].format.initialValue = {
         ...this.widgetBgSetting
       };
     }
