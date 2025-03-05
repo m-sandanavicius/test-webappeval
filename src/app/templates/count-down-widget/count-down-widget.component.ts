@@ -112,11 +112,10 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
       ]
     });
 
-    this.widgetDataService.widgetFormState[
-      this.category
-    ].settings.initialValue = {
-      ...this.countDownFormGroup.value
-    };
+    this.widgetDataService.widgetFormState["count_down"].settings.initialValue =
+      {
+        ...this.countDownFormGroup.value
+      };
   }
 
   save(): void {
