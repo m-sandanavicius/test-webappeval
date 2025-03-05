@@ -671,7 +671,6 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     );
 
     if (isSettingsFormChanged) {
-      console.log("saving calendar settings...");
       this.calendarWidgetFormatComponent.oncalendarFormatEmit();
       settingsForm.initialValue =
         this.calendarWidgetFormatComponent.calendarFormatFormGroup.value;
@@ -687,7 +686,6 @@ export class CalendarSettingComponent implements OnInit, OnChanges {
     );
 
     if (isFormatFormChanged) {
-      console.log("saving calendar format...");
       this.saveBackgroundSettings(
         this.widgetBgSettingComponent.bgSettingOptions
       );
