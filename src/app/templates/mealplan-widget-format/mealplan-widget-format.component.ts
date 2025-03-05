@@ -261,12 +261,11 @@ export class MealplanWidgetFormatComponent implements OnInit {
         ]
       });
 
-      this.widgetDataService.widgetFormState[
-        this.category
-      ].settings.initialValue = {
-        ...this.calendarFormatFormGroup.value,
-        ...this.getMealPlanSettingsAdditionalProps()
-      };
+      this.widgetDataService.widgetFormState["mealplan"].settings.initialValue =
+        {
+          ...this.calendarFormatFormGroup.value,
+          ...this.getMealPlanSettingsAdditionalProps()
+        };
     }
   }
 
