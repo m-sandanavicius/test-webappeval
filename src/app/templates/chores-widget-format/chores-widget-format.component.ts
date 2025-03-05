@@ -145,9 +145,7 @@ export class ChoresWidgetFormatComponent implements OnInit {
         ]
       });
 
-      this.widgetDataService.widgetFormState[
-        this.category
-      ].settings.initialValue = {
+      this.widgetDataService.widgetFormState["chores"].settings.initialValue = {
         ...this.todoFormatFormGroup.value,
         ...this.getChoresSettingsAdditionalProps()
       };
