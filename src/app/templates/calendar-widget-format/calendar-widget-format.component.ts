@@ -300,12 +300,11 @@ export class CalendarWidgetFormatComponent implements OnInit, OnChanges {
         // ],
       });
 
-      this.widgetDataService.widgetFormState[
-        this.category
-      ].settings.initialValue = {
-        ...this.calendarFormatFormGroup.value,
-        ...this.getCalendarSettingsAdditionalProps()
-      };
+      this.widgetDataService.widgetFormState["calendar"].settings.initialValue =
+        {
+          ...this.calendarFormatFormGroup.value,
+          ...this.getCalendarSettingsAdditionalProps()
+        };
     }
   }
 
