@@ -180,7 +180,6 @@ export class QuotesComponent implements OnInit, OnChanges {
       initialQuotes.every((quote) => currentQuotesSet.has(quote));
 
     if (!isSameQuotes) {
-      console.log("saving settings");
       this.saveQuotesSetting();
       settingsForm.initialValue["selectedQuotesCategoryList"] = [
         ...this.selectedQuotesCategoryList
@@ -197,7 +196,6 @@ export class QuotesComponent implements OnInit, OnChanges {
     );
 
     if (isFormatFormChanged) {
-      console.log("saving format");
       this.saveBackgroundSettings(
         this.widgetBgSettingComponent.bgSettingOptions
       );
