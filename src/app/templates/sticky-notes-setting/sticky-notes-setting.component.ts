@@ -92,9 +92,8 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
 
           this.widgetDataService.widgetFormState[
             this.category
-          ].settings.initialValue = {
-            ...this.notesWidgetObject.data.notesWidgetDetail.notesData
-          };
+          ].settings.initialValue =
+            this.notesWidgetObject.data.notesWidgetDetail.notesData || "";
         }
         this.setBackgroundWidgetDetail();
         this.openTextEditorToAddNewNote();
@@ -137,12 +136,7 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     const settingsForm =
       this.widgetDataService.widgetFormState[this.category].settings;
 
-    const isSettingsFormChanged = this.widgetDataService.isFormValueChanged(
-      settingsForm.initialValue,
-      this.notesBodyContent
-    );
-
-    if (isSettingsFormChanged) {
+    if (this.notesBodyContent !== settingsForm.initialValue) {
       this.saveNotesSetting();
       settingsForm.initialValue = this.notesBodyContent;
     }
