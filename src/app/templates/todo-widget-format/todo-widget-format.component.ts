@@ -147,9 +147,7 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
         ]
       });
 
-      this.widgetDataService.widgetFormState[
-        this.category
-      ].settings.initialValue = {
+      this.widgetDataService.widgetFormState["todo"].settings.initialValue = {
         ...this.todoFormatFormGroup.value,
         ...this.getTodoSettingsAdditionalProps()
       };
