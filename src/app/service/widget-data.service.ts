@@ -102,6 +102,12 @@ export class WidgetDataService {
   };
 
   isFormValueChanged(initialFormValue: any, currentFormValue: any): boolean {
+    if (
+      Object.keys(initialFormValue).length === 0 ||
+      Object.keys(currentFormValue).length === 0
+    ) {
+      return false;
+    }
     return Object.keys(initialFormValue).some(
       (key) => initialFormValue[key] !== currentFormValue[key]
     );

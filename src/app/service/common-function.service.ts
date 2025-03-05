@@ -7,9 +7,10 @@ import { WidgetService } from "./widget.service";
 // import * as mimeTypes from "mime-types";
 import mime from "mime";
 import { transition } from "@angular/animations";
+import { mergeMap } from "rxjs/operators";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class CommonFunction {
   constructor(
@@ -46,7 +47,7 @@ export class CommonFunction {
         ? (localObj["backgroundSetting"] = element.widgetBackgroundSettingModel)
         : (localObj["backgroundSetting"] = null);
       localObj["widget"] = {
-        id: element.contentId,
+        id: element.contentId
       };
       filteredList.push(localObj);
     });
@@ -74,9 +75,9 @@ export class CommonFunction {
         userMirror: {
           userRole: activeMirrorDetail.userRole,
           mirror: {
-            id: activeMirrorDetail.mirror.id,
+            id: activeMirrorDetail.mirror.id
           },
-          clockMessageStatus: clockgreeting != null ? clockgreeting : false,
+          clockMessageStatus: clockgreeting != null ? clockgreeting : false
         },
         mirrorPage: {
           delay: element.delay,
@@ -84,8 +85,8 @@ export class CommonFunction {
           pageNumber: element.pageNumber,
           isBackgroundImage: element.isBackgroundImage,
           transition: element.transition,
-          isAutoPageRotation: element.isAutoPageRotation,
-        },
+          isAutoPageRotation: element.isAutoPageRotation
+        }
       };
       genericWidgetSettingModelList.push(pageWidgetSettingModel);
     });
@@ -103,6 +104,28 @@ export class CommonFunction {
         this.getLayoutAPICall();
       });
     }
+  }
+
+  updateWidgetSettings$(bgsettingOptions, payload) {
+    if (bgsettingOptions && bgsettingOptions.id) {
+      return this._widgetService
+        .updateWidgetBgSetting(payload)
+        .pipe(mergeMap((res) => this.getLayoutAPICall$()));
+    } else if (bgsettingOptions) {
+      delete payload["widgetBackgroundSettingModel"]["id"];
+      return this._widgetService
+        .addWidgetBgSetting(payload)
+        .pipe(mergeMap((res) => this.getLayoutAPICall$()));
+    }
+  }
+
+  getLayoutAPICall$() {
+    let layoutRequestPayload: any = this.storage.get("layoutrequest");
+    return this._widgetService.getwidgetLayoutSettings(
+      layoutRequestPayload.payload
+        ? layoutRequestPayload.payload
+        : layoutRequestPayload
+    );
   }
 
   getLayoutAPICall() {
@@ -128,7 +151,7 @@ export class CommonFunction {
   getFileMimeType(fileName: string): string {
     mime.define(
       {
-        "image/jpeg": ["jfif"],
+        "image/jpeg": ["jfif"]
       },
       { force: true }
     );

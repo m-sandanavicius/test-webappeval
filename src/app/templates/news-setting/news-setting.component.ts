@@ -63,6 +63,9 @@ export class NewsSettingComponent implements OnInit {
   widgetBgSetting: any;
   newBgSetting: any;
 
+  currentNewsIds: any[];
+  widgetInfo: any;
+
   constructor(
     private toastr: ToastrService,
     private _widgetService: WidgetService,
@@ -134,10 +137,6 @@ export class NewsSettingComponent implements OnInit {
     this.widgetDataService.widgetFormState[this.category].settings.initialValue[
       "initialSelectedNewsWidgets"
     ] = [...this.selectedNewsWidgets];
-    console.log(
-      this.widgetDataService.widgetFormState[this.category].settings
-        .initialValue
-    );
 
     newsCategoryList.forEach((element) => {
       if (this.selectedNewsWidgets.includes(element.id)) {
@@ -217,7 +216,21 @@ export class NewsSettingComponent implements OnInit {
   }
 
   save(): void {
-    // Checks if need to save settings form
+    // Checks if need to save format form
+    const formatForm =
+      this.widgetDataService.widgetFormState[this.category].format;
+
+    let isFormatFormChanged = false;
+    if (
+      formatForm.initialValue &&
+      this.widgetBgSettingComponent.bgSettingOptions
+    ) {
+      isFormatFormChanged = this.widgetDataService.isFormValueChanged(
+        formatForm.initialValue,
+        this.widgetBgSettingComponent.bgSettingOptions
+      );
+    }
+
     const settingsForm =
       this.widgetDataService.widgetFormState[this.category].settings;
     const initialNewsIds =
@@ -229,42 +242,103 @@ export class NewsSettingComponent implements OnInit {
       initialNewsIdsSet.size === currentNewsIdSet.size &&
       initialNewsIds.every((quote) => currentNewsIdSet.has(quote));
 
-    console.log(isSameNews);
-
-    if (!isSameNews) {
-      console.log("saving settings...");
-      this.saveNewsSettings();
-    }
-
-    // Checks if need to save format form
-    const formatForm =
-      this.widgetDataService.widgetFormState[this.category].format;
-
-    const isFormatFormChanged = this.widgetDataService.isFormValueChanged(
-      formatForm.initialValue,
-      this.widgetBgSettingComponent.bgSettingOptions
-    );
-
-    if (isFormatFormChanged) {
-      console.log("saving format");
+    if (isFormatFormChanged && !isSameNews) {
+      this.saveAll(this.widgetBgSettingComponent.bgSettingOptions);
+    } else if (isFormatFormChanged) {
       this.saveBackgroundSettings(
         this.widgetBgSettingComponent.bgSettingOptions
       );
       formatForm.initialValue = this.widgetBgSettingComponent.bgSettingOptions;
+    } else if (!isSameNews) {
+      this.saveNewsSettings();
     }
 
-    // this.newsSettingModal.hide();
+    this.newsSettingModal.hide();
   }
 
-  saveNewsSettings(): void {
+  saveAll(event) {
+    this.newBgSetting = event;
+    const newsBgPayload = {
+      userMirrorId: this.activeMirrorDetails.id,
+      mastercategory: [this.newsWidget.widgetMasterCategory],
+      widgetBackgroundSettingModel: this.newBgSetting
+    };
+
+    this.commonFunction
+      .updateWidgetSettings$(this.newBgSetting, newsBgPayload)
+      .subscribe({
+        next: (data: any) => {
+          let oldNewsIds = this.storage.get("selectedNewsWidgetId");
+          this.currentNewsIds = [...this.selectedNewsWidgets];
+          let toRemoveNewsIds = oldNewsIds.filter(
+            (oldNewId) => !this.currentNewsIds.includes(oldNewId)
+          );
+
+          this.widgetInfo = data.object;
+
+          // to add missing news in service
+          this.currentNewsIds.forEach((id) => {
+            let selectedIndex = this.customFindIndex(
+              this.widgetInfo.widgetSetting,
+              id
+            );
+            let categoryIndex = this.newsCategoryList.findIndex(
+              (element) => element.id === id
+            );
+            // local displaying object changes
+            this.newsCategoryList[categoryIndex].status = "on";
+            this.selectedNewsWidgets.push(id);
+
+            // changes to service
+            this.widgetInfo.widgetSetting[0].widgets[
+              selectedIndex.widgetIndex
+            ].status = "on";
+            this.widgetInfo.widgetSetting[0].widgets.push(
+              this.widgetInfo.widgetSetting[0].widgets[
+                selectedIndex.widgetIndex
+              ]
+            );
+            this.widgetInfo.widgetSetting[0].widgets.splice(
+              selectedIndex.widgetIndex,
+              1
+            );
+          });
+
+          // to remove news in service
+          toRemoveNewsIds.forEach((id) => {
+            let selectedIndex = this.customFindIndex(
+              this.widgetInfo.widgetSetting,
+              id
+            );
+            let categoryIndex = this.newsCategoryList.findIndex(
+              (element) => element.id === id
+            );
+            // local displaying object changes
+            this.newsCategoryList[categoryIndex].status = "off";
+            this.selectedNewsWidgets.splice(
+              this.selectedNewsWidgets.indexOf(id),
+              1
+            );
+            // data service object changes
+            this.widgetInfo.widgetSetting[0].widgets[
+              selectedIndex.widgetIndex
+            ].status = "off";
+          });
+
+          this._dataService.setWidgetSettingsLayout(this.widgetInfo);
+
+          this.updateNewsCountEventEmiter.emit(this.selectedHeadLineCount);
+          this.updateWidgetStatusEventEmiter.emit();
+        }
+      });
+  }
+
+  saveNewsSettings(bgSettings?: any): void {
     this._dataService
       .getActiveMirrorDetails()
       .subscribe((data) => (this.activeMirrorDetail = data));
-    console.log(this.activeMirrorDetail);
-    console.log(this.selectedHeadLineCount);
     this.updateNewsCountEventEmiter.emit(this.selectedHeadLineCount);
     this.updateWidgetStatusEventEmiter.emit();
-    // this.newsSettingModal.hide();
   }
 
   saveBackgroundSettings(event): void {
@@ -275,10 +349,9 @@ export class NewsSettingComponent implements OnInit {
       widgetBackgroundSettingModel: this.newBgSetting
     };
     this.commonFunction.updateWidgetSettings(this.newBgSetting, newsBgPayload);
-    // this.newsSettingModal.hide();
   }
 
   dismissModel() {
-    // this.newsSettingModal.hide();
+    this.newsSettingModal.hide();
   }
 }
