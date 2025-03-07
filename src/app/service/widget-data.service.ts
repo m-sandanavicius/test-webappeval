@@ -1,104 +1,104 @@
 import { Injectable } from "@angular/core";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class WidgetDataService {
   widgetFormState = {
     clock: {
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     weather: {
       settings: {
         initialValue: {},
-        currentValue: {}
+        currentValue: {},
       },
       format: {
         initialValue: {},
-        currentValue: {}
-      }
+        currentValue: {},
+      },
     },
     quotes: {
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     news: {
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     count_down: {
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     notes: {
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     calendar: {
       calendars: {
-        initialValue: {}
+        initialValue: {},
       },
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     chores: {
       chores: {
-        initialValue: {}
+        initialValue: {},
       },
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     todo: {
       todos: {
-        initialValue: {}
+        initialValue: {},
       },
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
+        initialValue: {},
+      },
     },
     mealplan: {
       calendars: {
-        initialValue: {}
+        initialValue: {},
       },
       settings: {
-        initialValue: {}
+        initialValue: {},
       },
       format: {
-        initialValue: {}
-      }
-    }
+        initialValue: {},
+      },
+    },
   };
 
   isFormValueChanged(initialFormValue: any, currentFormValue: any): boolean {

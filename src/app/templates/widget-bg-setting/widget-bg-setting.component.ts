@@ -4,19 +4,19 @@ import {
   HostListener,
   Input,
   OnChanges,
-  Output
+  Output,
 } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
 import {
   Fonts,
   SupportedFontSize,
-  text_alignment
+  text_alignment,
 } from "src/app/util/static-data";
 
 @Component({
   selector: "app-widget-bg-setting",
   templateUrl: "./widget-bg-setting.component.html",
-  styleUrls: ["./widget-bg-setting.component.scss"]
+  styleUrls: ["./widget-bg-setting.component.scss"],
 })
 export class WidgetBgSettingComponent
   implements OnInit, OnChanges, AfterViewInit
@@ -33,11 +33,11 @@ export class WidgetBgSettingComponent
     "quotes",
     "notes",
     "stickynotes",
-    "weather"
+    "weather",
   ];
   supportedCustomTitleModification: any[] = [
     ...this.supportedCustomTitleNameModification,
-    "news"
+    "news",
   ];
 
   bgSettingOptions = {
@@ -59,7 +59,7 @@ export class WidgetBgSettingComponent
     titleFontFamily: "Open Sans",
     titleFontColor: "#212529",
     titleBackgroundColor: "#FCFCFC",
-    titleAlignment: "center"
+    titleAlignment: "center",
   };
 
   @Input() widgetType: any;
@@ -124,7 +124,7 @@ export class WidgetBgSettingComponent
     "todo",
     "count_down",
     "chores",
-    "mealplan"
+    "mealplan",
   ];
 
   constructor() {
@@ -132,7 +132,7 @@ export class WidgetBgSettingComponent
       id: 0,
       googleFontName: "default",
       googleFontsPath: "",
-      fontCategory: "default"
+      fontCategory: "default",
     };
     this.availableFontFamilies.unshift(defaultFontFamily);
   }

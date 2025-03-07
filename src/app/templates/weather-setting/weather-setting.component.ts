@@ -8,7 +8,7 @@ import {
   Output,
   Input,
   EventEmitter,
-  AfterViewInit
+  AfterViewInit,
 } from "@angular/core";
 import { WidgetService } from "src/app/service/widget.service";
 import { LocalStorageService } from "angular-web-storage";
@@ -27,7 +27,7 @@ import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting
 @Component({
   selector: "app-weather-setting",
   templateUrl: "./weather-setting.component.html",
-  styleUrls: ["./weather-setting.component.scss"]
+  styleUrls: ["./weather-setting.component.scss"],
 })
 export class WeatherSettingComponent
   implements OnInit, OnChanges, AfterViewInit
@@ -96,7 +96,7 @@ export class WeatherSettingComponent
   ngOnInit() {
     this.fg = this.formBuilder.group({
       weatherType: [],
-      temperatureUnit: [""]
+      temperatureUnit: [""],
     });
   }
 
@@ -131,7 +131,7 @@ export class WeatherSettingComponent
           let location = {
             latitude: this.latitude,
             longitude: this.longitude,
-            locationName: this.address
+            locationName: this.address,
           };
           this.storage.set("location", location);
         });
@@ -158,7 +158,7 @@ export class WeatherSettingComponent
             let location = {
               latitude: this.latitude,
               longitude: this.longitude,
-              address: this.address
+              address: this.address,
             };
             this.storage.set("location", location);
             this.getAddress(this.latitude, this.longitude);
@@ -182,7 +182,7 @@ export class WeatherSettingComponent
       this.widgetBgSetting = widgetData.widgetBackgroundSettingModel;
 
       this.widgetDataService.widgetFormState["weather"].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -219,7 +219,7 @@ export class WeatherSettingComponent
 
       // set initial value of settings form
       this.widgetDataService.widgetFormState.weather.settings.initialValue = {
-        ...this.fg.value
+        ...this.fg.value,
       };
     }
     this.setBackgroundWidgetDetail();
@@ -228,8 +228,8 @@ export class WeatherSettingComponent
       temperatureUnit: {
         unit: userData.temperatureUnit,
         measure: ["Celsius", "Fahrenheit"],
-        activeUnit: userData.temperatureUnit
-      }
+        activeUnit: userData.temperatureUnit,
+      },
     };
   }
 
@@ -237,8 +237,8 @@ export class WeatherSettingComponent
     let data = {
       location: {
         lat: latitude,
-        lng: longitude
-      }
+        lng: longitude,
+      },
     };
 
     this.geoCoder.geocode(data, (results, status) => {
@@ -304,7 +304,7 @@ export class WeatherSettingComponent
     const weatherBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: ["weather"],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -321,7 +321,7 @@ export class WeatherSettingComponent
     let payload = {};
     payload["id"] = this.weatherWidgetData.id;
     payload["widgetSetting"] = {
-      id: this.weatherWidgetObject.widgetSettingId
+      id: this.weatherWidgetObject.widgetSettingId,
     };
     payload["weatherType"] = this.weatherType;
     if (location != null) {
@@ -329,7 +329,7 @@ export class WeatherSettingComponent
         locationName: location.locationName,
         longitude: location.longitude,
         latitude: location.latitude,
-        language: location.language
+        language: location.language,
       };
       if (location.id != undefined) {
         locationData["id"] = location.id;
@@ -375,7 +375,7 @@ export class WeatherSettingComponent
   onUnitMeasureChanges(newUnit: string): void {
     this.measureUnitData.temperatureUnit.activeUnit = newUnit;
     let payload: any = {
-      temperatureUnit: this.measureUnitData.temperatureUnit.activeUnit
+      temperatureUnit: this.measureUnitData.temperatureUnit.activeUnit,
     };
     this.fg.get("temperatureUnit").setValue(newUnit);
 
@@ -404,5 +404,5 @@ export class WeatherSettingComponent
 enum WeatherType {
   TodayWeather = "Today's Weather",
   WeatherForecast24Hours = "24 Hour Weather Forecast",
-  WeatherForecast5Days = "5 Day Weather Forecast"
+  WeatherForecast5Days = "5 Day Weather Forecast",
 }

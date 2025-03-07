@@ -11,7 +11,7 @@ import { WidgetDataService } from "src/app/service/widget-data.service";
 @Component({
   selector: "app-quote-setting",
   templateUrl: "./quotes.component.html",
-  styleUrls: ["./quotes.component.scss"]
+  styleUrls: ["./quotes.component.scss"],
 })
 export class QuotesComponent implements OnInit, OnChanges {
   @ViewChild(WidgetBgSettingComponent, { static: false })
@@ -70,17 +70,17 @@ export class QuotesComponent implements OnInit, OnChanges {
       this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
       this.quotesWidget = this.quotesWidgetObject;
       this.selectedQuotesCategoryList = [
-        ...this.quotesWidget.data.selectedQuoteCategories
+        ...this.quotesWidget.data.selectedQuoteCategories,
       ];
 
       this.widgetDataService.widgetFormState[
         this.category
       ].settings.initialValue["selectedQuotesCategoryList"] = [
-        ...this.quotesWidget.data.selectedQuoteCategories
+        ...this.quotesWidget.data.selectedQuoteCategories,
       ];
 
       this.lastSelectedQuotesCategoryList = [
-        ...this.quotesWidget.data.selectedQuoteCategories
+        ...this.quotesWidget.data.selectedQuoteCategories,
       ];
       // this.selectedQuotesLength = this.quotesWidget.data.selectedQuoteLength;
       // this.lastSelectedQuotesLength =
@@ -96,7 +96,7 @@ export class QuotesComponent implements OnInit, OnChanges {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -182,7 +182,7 @@ export class QuotesComponent implements OnInit, OnChanges {
     if (!isSameQuotes) {
       this.saveQuotesSetting();
       settingsForm.initialValue["selectedQuotesCategoryList"] = [
-        ...this.selectedQuotesCategoryList
+        ...this.selectedQuotesCategoryList,
       ];
     }
 
@@ -209,8 +209,8 @@ export class QuotesComponent implements OnInit, OnChanges {
     let payload = {
       quotesCategories: this.getSelectedQuotesCategories(),
       widgetSetting: {
-        id: this.quotesWidgetObject.widgetSettingId
-      }
+        id: this.quotesWidgetObject.widgetSettingId,
+      },
     };
 
     this.loadingSpinner.show();
@@ -244,7 +244,7 @@ export class QuotesComponent implements OnInit, OnChanges {
     const quotesBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.quotesWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,

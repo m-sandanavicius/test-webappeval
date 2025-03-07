@@ -4,7 +4,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { LocalStorageService } from "angular-web-storage";
@@ -21,7 +21,7 @@ import { TodoWidgetFormatComponent } from "../todo-widget-format/todo-widget-for
 @Component({
   selector: "app-todo",
   templateUrl: "./todo.component.html",
-  styleUrls: ["./todo.component.scss"]
+  styleUrls: ["./todo.component.scss"],
 })
 export class TodoComponent implements OnInit, OnChanges {
   @ViewChild(WidgetBgSettingComponent, { static: false })
@@ -78,12 +78,12 @@ export class TodoComponent implements OnInit, OnChanges {
         let payload = {
           userMirrorModel: {
             mirror: {
-              id: this.todoTaskCredentials.mirrorDetails.mirror.id
+              id: this.todoTaskCredentials.mirrorDetails.mirror.id,
             },
-            userRole: this.todoTaskCredentials.mirrorDetails.userRole
+            userRole: this.todoTaskCredentials.mirrorDetails.userRole,
           },
           widgetSettingId: this.todoWidgetObject.widgetSettingId,
-          authorizationCode: this.todoTaskCredentials.code
+          authorizationCode: this.todoTaskCredentials.code,
         };
         this.updateGoogleCredential(payload);
       }
@@ -94,12 +94,12 @@ export class TodoComponent implements OnInit, OnChanges {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.todoTaskCredentials.mirrorDetails.mirror.id
+            id: this.todoTaskCredentials.mirrorDetails.mirror.id,
           },
-          userRole: this.todoTaskCredentials.mirrorDetails.userRole
+          userRole: this.todoTaskCredentials.mirrorDetails.userRole,
         },
         widgetSettingId: this.todoWidgetObject.widgetSettingId,
-        authorizationCode: this.todoTaskCredentials.code
+        authorizationCode: this.todoTaskCredentials.code,
       };
       this.updateOutlookCredential(payload);
     } else if (
@@ -109,12 +109,12 @@ export class TodoComponent implements OnInit, OnChanges {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.todoTaskCredentials.mirrorDetails.mirror.id
+            id: this.todoTaskCredentials.mirrorDetails.mirror.id,
           },
-          userRole: this.todoTaskCredentials.mirrorDetails.userRole
+          userRole: this.todoTaskCredentials.mirrorDetails.userRole,
         },
         widgetSettingId: this.todoWidgetObject.widgetSettingId,
-        authorizationCode: this.todoTaskCredentials.code
+        authorizationCode: this.todoTaskCredentials.code,
       };
       this.updateTodoistCredential(payload);
     }
@@ -158,10 +158,10 @@ export class TodoComponent implements OnInit, OnChanges {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id
+        id: this.activeMirrorDetails.id,
       },
       widgetSettingId: this.todoWidgetObject.widgetSettingId,
-      selectedTodoProject: this.previouslyAddedProjects
+      selectedTodoProject: this.previouslyAddedProjects,
     };
     this.loadingSpinner.show();
     this._todoService.updateSelectedProject(payload).subscribe(
@@ -197,7 +197,7 @@ export class TodoComponent implements OnInit, OnChanges {
       settingsForm.initialValue,
       {
         ...this.todoWidgetFormatComponent.todoFormatFormGroup.value,
-        ...this.todoWidgetFormatComponent.getTodoSettingsAdditionalProps()
+        ...this.todoWidgetFormatComponent.getTodoSettingsAdditionalProps(),
       }
     );
 
@@ -247,7 +247,7 @@ export class TodoComponent implements OnInit, OnChanges {
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.todoWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -274,7 +274,7 @@ export class TodoComponent implements OnInit, OnChanges {
         forgroundColor: requestObject.forgroundColor,
         todoAccountId: requestObject.todoAccountId,
         etag: requestObject.etag,
-        projectName: requestObject.projectName
+        projectName: requestObject.projectName,
       };
       this.previouslyAddedProjects.push(customData);
     }
@@ -385,7 +385,7 @@ export class TodoComponent implements OnInit, OnChanges {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -439,7 +439,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "google",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject
+          projectList: res.object.selectedTodoProject,
         };
 
         this.accountList.push(data);
@@ -509,7 +509,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "outlook",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject
+          projectList: res.object.selectedTodoProject,
         };
 
         this.accountList.push(data);
@@ -580,7 +580,7 @@ export class TodoComponent implements OnInit, OnChanges {
           id: res.object.todoAccountDetailModel.id,
           accountType: "todoist",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
-          projectList: res.object.selectedTodoProject
+          projectList: res.object.selectedTodoProject,
         };
 
         this.accountList.push(data);

@@ -12,7 +12,7 @@ import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting
 @Component({
   selector: "app-sticky-notes-setting",
   templateUrl: "./sticky-notes-setting.component.html",
-  styleUrls: ["./sticky-notes-setting.component.scss"]
+  styleUrls: ["./sticky-notes-setting.component.scss"],
 })
 export class StickyNotesSettingComponent implements OnInit, OnChanges {
   @ViewChild(WidgetBgSettingComponent, { static: false })
@@ -59,9 +59,9 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
         "insertImage",
         "fontSize",
         "fontName",
-        "heading"
-      ]
-    ]
+        "heading",
+      ],
+    ],
   };
 
   constructor(
@@ -110,7 +110,7 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -165,8 +165,8 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
       id: this.notesWidgetObject.data.notesWidgetDetail.id,
       notesData: this.notesBodyContent,
       widgetSetting: {
-        id: this.notesWidgetObject.widgetSettingId
-      }
+        id: this.notesWidgetObject.widgetSettingId,
+      },
     };
 
     this.loadingSpinner.show();
@@ -198,7 +198,7 @@ export class StickyNotesSettingComponent implements OnInit, OnChanges {
     const stickyBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.notesWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,

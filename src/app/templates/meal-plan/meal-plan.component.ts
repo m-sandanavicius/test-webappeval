@@ -5,7 +5,7 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -26,7 +26,7 @@ import { MealplanWidgetFormatComponent } from "../mealplan-widget-format/mealpla
 @Component({
   selector: "app-meal-plan",
   templateUrl: "./meal-plan.component.html",
-  styleUrls: ["./meal-plan.component.scss"]
+  styleUrls: ["./meal-plan.component.scss"],
 })
 export class MealPlanComponent implements OnInit {
   @ViewChild("calendarQuantityAlert", { static: true })
@@ -277,7 +277,7 @@ export class MealPlanComponent implements OnInit {
         isCustomEtag:
           requestObject.isCustomEtag == null
             ? false
-            : requestObject.isCustomEtag
+            : requestObject.isCustomEtag,
       };
 
       if (
@@ -327,7 +327,7 @@ export class MealPlanComponent implements OnInit {
         "com.chakra.mangomirror.us.monthly",
         "com.chakra.mangomirror.us.yearly",
         "plus_yearly",
-        "plus_monthly"
+        "plus_monthly",
       ].includes(subscriptionData.productId);
   }
 
@@ -356,7 +356,7 @@ export class MealPlanComponent implements OnInit {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -399,7 +399,7 @@ export class MealPlanComponent implements OnInit {
       settingsForm.initialValue,
       {
         ...this.mealPlanWidgetFormatComponent.calendarFormatFormGroup.value,
-        ...this.mealPlanWidgetFormatComponent.getMealPlanSettingsAdditionalProps()
+        ...this.mealPlanWidgetFormatComponent.getMealPlanSettingsAdditionalProps(),
       }
     );
 
@@ -452,10 +452,10 @@ export class MealPlanComponent implements OnInit {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id
+        id: this.activeMirrorDetails.id,
       },
       widgetSettingId: this.mealWidgetObject.widgetSettingId,
-      selectedCalendar: this.previouslyAddedCalendars
+      selectedCalendar: this.previouslyAddedCalendars,
     };
     this.loadingSpinner.show();
     this._calendarService.updateCalendarList(payload).subscribe(
@@ -489,7 +489,7 @@ export class MealPlanComponent implements OnInit {
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.mealPlanWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,

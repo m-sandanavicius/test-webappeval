@@ -4,7 +4,7 @@ import {
   Input,
   OnChanges,
   OnInit,
-  Output
+  Output,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { LocalStorageService } from "angular-web-storage";
@@ -18,7 +18,7 @@ import { WidgetService } from "src/app/service/widget.service";
 @Component({
   selector: "app-todo-widget-format",
   templateUrl: "./todo-widget-format.component.html",
-  styleUrls: ["./todo-widget-format.component.scss"]
+  styleUrls: ["./todo-widget-format.component.scss"],
 })
 export class TodoWidgetFormatComponent implements OnInit, OnChanges {
   @Input() activeLayout: any;
@@ -47,7 +47,7 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
   eventRangeSelection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   dayRangeSelection = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30
+    22, 23, 24, 25, 26, 27, 28, 29, 30,
   ];
 
   calendarToggle: boolean = false;
@@ -59,7 +59,7 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
     task_duration: "all_task",
     isPastEventEnabled: true,
     numberOfDays: 5,
-    isOverDueTaskVisible: true
+    isOverDueTaskVisible: true,
   };
 
   constructor(
@@ -108,48 +108,48 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
       this.todoFormatFormGroup = this.formBuilder.group({
         showEndDate: [
           todoFormatData ? todoFormatData.showEndDate : false,
-          Validators.requiredTrue
+          Validators.requiredTrue,
         ],
 
         taskEditEnable: [
           todoFormatData ? todoFormatData.taskEditEnable : false,
-          Validators.requiredTrue
+          Validators.requiredTrue,
         ],
 
         showCompletedTask: [
           todoFormatData ? todoFormatData.showCompletedTask : false,
-          Validators.requiredTrue
+          Validators.requiredTrue,
         ],
 
         numberOfEvent: [
           todoFormatData.numberOfEvent ? todoFormatData.numberOfEvent : 5,
-          Validators.required
+          Validators.required,
         ],
 
         numberOfDays: [
           todoFormatData.numberOfDays ? todoFormatData.numberOfDays : 5,
-          Validators.required
+          Validators.required,
         ],
 
         task_duration: [
           todoFormatData.task_duration ? todoFormatData.task_duration : "Today",
-          Validators.required
+          Validators.required,
         ],
 
         isPastEventEnabled: [
           todoFormatData ? false : false,
-          Validators.required
+          Validators.required,
         ],
 
         isOverDueTaskVisible: [
           todoFormatData ? todoFormatData.isOverDueTaskVisible : false,
-          Validators.required
-        ]
+          Validators.required,
+        ],
       });
 
       this.widgetDataService.widgetFormState["todo"].settings.initialValue = {
         ...this.todoFormatFormGroup.value,
-        ...this.getTodoSettingsAdditionalProps()
+        ...this.getTodoSettingsAdditionalProps(),
       };
     }
   }
@@ -161,7 +161,7 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
   getTodoSettingsAdditionalProps() {
     return {
       scrolling: this.scrolling,
-      id: this.todoCurrentFormatSetting.id || null
+      id: this.todoCurrentFormatSetting.id || null,
     };
   }
 
@@ -210,7 +210,7 @@ export class TodoWidgetFormatComponent implements OnInit, OnChanges {
     let payload = {
       userMirrorId: this.activeMirrorDetail.id,
       todoWidgetSettingModel: this.todoFormatFormGroup.value,
-      widgetSettingId: this.todoWidgetObject.widgetSettingId
+      widgetSettingId: this.todoWidgetObject.widgetSettingId,
     };
 
     if (this.todoCurrentFormatSetting != undefined) {

@@ -3,7 +3,7 @@ import {
   OnInit,
   ViewChild,
   HostListener,
-  ElementRef
+  ElementRef,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DataService } from "src/app/service/data.service";
@@ -32,7 +32,7 @@ declare var StripeCheckout: any;
 @Component({
   selector: "app-layout-component",
   templateUrl: "./layout-component.component.html",
-  styleUrls: ["./layout-component.component.scss"]
+  styleUrls: ["./layout-component.component.scss"],
 })
 export class LayoutComponentComponent implements OnInit {
   // introJS = introJs();
@@ -245,7 +245,7 @@ export class LayoutComponentComponent implements OnInit {
     try {
       this.dragulaService.createGroup("pagecontainer", {
         direction: "horizontal", // Make it horizontal
-        moves: (el, container, handle) => true // Allow dragging from any element
+        moves: (el, container, handle) => true, // Allow dragging from any element
       });
     } catch (error) {
       console.log(error);
@@ -273,7 +273,7 @@ export class LayoutComponentComponent implements OnInit {
   updateLayoutSequence() {
     let payload = {
       displayPages: [],
-      userMirrorModel: { id: this.userMirrorDetails.id }
+      userMirrorModel: { id: this.userMirrorDetails.id },
     };
 
     let displayPages = [];
@@ -564,7 +564,7 @@ export class LayoutComponentComponent implements OnInit {
       this.userCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("googleAuthCode"),
-        type: "google"
+        type: "google",
       };
       if (this.category != "gesture") {
         this.category = "calendar";
@@ -575,7 +575,7 @@ export class LayoutComponentComponent implements OnInit {
       this.todoTaskCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("googleTaskAuthCode"),
-        type: "googletask"
+        type: "googletask",
       };
       this.category = "todo";
       this.todoWidgetObject = this.storage.get("selectedwidget");
@@ -588,14 +588,14 @@ export class LayoutComponentComponent implements OnInit {
       ) {
         this.imageWidgetGooglePhotoCredentials = {
           mirrorDetails: this.userMirrorDetails,
-          code: this.storage.get("googlePhotosAuthCode")
+          code: this.storage.get("googlePhotosAuthCode"),
         };
         this.category = "image";
         this.imageSettingModal.show();
       } else {
         this.googlePhotoCredentials = {
           mirrorDetails: this.userMirrorDetails,
-          code: this.storage.get("googlePhotosAuthCode")
+          code: this.storage.get("googlePhotosAuthCode"),
         };
         this.category = "background image";
         this.openWidgetCategorySettingModal("background image", null, false);
@@ -604,7 +604,7 @@ export class LayoutComponentComponent implements OnInit {
       this.userCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("outlookAuthCode"),
-        type: "outlook"
+        type: "outlook",
       };
 
       if (this.category != "gesture") {
@@ -616,7 +616,7 @@ export class LayoutComponentComponent implements OnInit {
       this.todoTaskCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("outlookTaskAuthCode"),
-        type: "outlookTask"
+        type: "outlookTask",
       };
       this.category = "todo";
       this.todoWidgetObject = this.storage.get("selectedwidget");
@@ -625,7 +625,7 @@ export class LayoutComponentComponent implements OnInit {
       this.todoTaskCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("todoistTaskAuthCode"),
-        type: "todoist"
+        type: "todoist",
       };
       this.category = "todo";
       this.todoWidgetObject = this.storage.get("selectedwidget");
@@ -634,7 +634,7 @@ export class LayoutComponentComponent implements OnInit {
       this.choresTaskCredentials = {
         mirrorDetails: this.userMirrorDetails,
         code: this.storage.get("choresTodoistTaskAuthCode"),
-        type: "chores"
+        type: "chores",
       };
       this.category = "chores";
       this.choresWidgetObject = this.storage.get("selectedwidget");
@@ -647,7 +647,7 @@ export class LayoutComponentComponent implements OnInit {
       delay: widgetSetting.delay,
       transition:
         widgetSetting.transition != null ? widgetSetting.transition : "fade",
-      isAutoPageRotation: widgetSetting.isAutoPageRotation
+      isAutoPageRotation: widgetSetting.isAutoPageRotation,
     };
 
     // this.delayInterval = widgetSetting.delay;
@@ -671,7 +671,7 @@ export class LayoutComponentComponent implements OnInit {
         var productId = res.object.productId;
         let subscriptionDetail = {
           isLifeTimeSubscriptionAvailable: false,
-          isSubscriptionAvailable: false
+          isSubscriptionAvailable: false,
         };
         if (productId == "free") {
           subscriptionDetail.isLifeTimeSubscriptionAvailable = true;
@@ -902,10 +902,10 @@ export class LayoutComponentComponent implements OnInit {
       isLayoutBackgroundUpdated: true,
       userMirrorModel: {
         mirror: {
-          id: this.userMirrorDetails.mirror.id
+          id: this.userMirrorDetails.mirror.id,
         },
-        userRole: this.userMirrorDetails.userRole
-      }
+        userRole: this.userMirrorDetails.userRole,
+      },
     };
 
     let backgroundImageData = this.widgetLayoutDetails.backgroundImageDetails;
@@ -956,10 +956,10 @@ export class LayoutComponentComponent implements OnInit {
     let payload = {
       userMirrorModel: {
         mirror: {
-          id: this.userMirrorDetails.mirror.id
+          id: this.userMirrorDetails.mirror.id,
         },
-        userRole: this.userMirrorDetails.userRole
-      }
+        userRole: this.userMirrorDetails.userRole,
+      },
     };
     payload["calendarFlag"] = false;
     this.widgetSettings.forEach((element) => {
@@ -972,12 +972,12 @@ export class LayoutComponentComponent implements OnInit {
         delay: element.delay,
         isTilled: element.isTilled,
         pageNumber: element.pageNumber,
-        isBackgroundImage: element.isBackgroundImage
+        isBackgroundImage: element.isBackgroundImage,
       };
       let data = {
         widgets: widgets,
         userMirror: payload.userMirrorModel,
-        mirrorPage: mirrorPageDetail
+        mirrorPage: mirrorPageDetail,
       };
       this.updatedWidgetSetting.push(data);
     });
@@ -1005,7 +1005,7 @@ export class LayoutComponentComponent implements OnInit {
     let weatherCategoryList = [
       "weather",
       "24 Hour Weather Forecast",
-      "5 Day Weather Forecast"
+      "5 Day Weather Forecast",
     ];
     let subscription = this.storage.get("subscriptionDetails");
     let currentSubscription = this.storage.get("subscriptionObject");
@@ -1181,7 +1181,7 @@ export class LayoutComponentComponent implements OnInit {
               planName: planData.commonName,
               widgetName: sourceCategory,
               currentPlan:
-                currentDataPlan != null ? currentDataPlan.commonName : null
+                currentDataPlan != null ? currentDataPlan.commonName : null,
             };
             this.commonAlertData = data;
             this.commonAlertHeader = "Update Plan";
@@ -1356,9 +1356,9 @@ export class LayoutComponentComponent implements OnInit {
     // } else {
     let userMirrorModel = {
       mirror: {
-        id: this.userMirrorDetails.mirror.id
+        id: this.userMirrorDetails.mirror.id,
       },
-      userRole: this.userMirrorDetails.userRole
+      userRole: this.userMirrorDetails.userRole,
     };
     let data = {
       widgets: widgetsList,
@@ -1368,7 +1368,7 @@ export class LayoutComponentComponent implements OnInit {
       transition: "fade",
       isTilled: true,
       pageNumber: this.widgetSettings.length + 1,
-      userMirror: userMirrorModel
+      userMirror: userMirrorModel,
     };
     this.widgetSettings.push(data);
     this.widgetLayoutDetails.widgetSetting = this.widgetSettings;
@@ -1512,7 +1512,7 @@ export class LayoutComponentComponent implements OnInit {
           ) {
             if (widgetContentId == 3) {
               let widgetSetting = {
-                widgetSettingId: this.selectedWidgetSettingId
+                widgetSettingId: this.selectedWidgetSettingId,
               };
               this.removeWidgetSetting(widgetSetting, 0, true);
             } else {
@@ -1737,15 +1737,15 @@ export class LayoutComponentComponent implements OnInit {
     return {
       userMirrorModel: {
         mirror: {
-          id: this.userMirrorDetails.mirror.id
+          id: this.userMirrorDetails.mirror.id,
         },
-        userRole: this.userMirrorDetails.userRole
+        userRole: this.userMirrorDetails.userRole,
       },
-      calendarFlag: true
+      calendarFlag: true,
     };
   }
 
-  updateWidgetStatusEventEmiter(bgSettings) {
+  updateWidgetStatusEventEmiter() {
     this.updateWidgetSettingAPI(true);
   }
 
@@ -1853,10 +1853,10 @@ export class LayoutComponentComponent implements OnInit {
       payload = {
         userMirrorModel: {
           mirror: {
-            id: this.userMirrorDetails.mirror.id
+            id: this.userMirrorDetails.mirror.id,
           },
-          userRole: this.userMirrorDetails.userRole
-        }
+          userRole: this.userMirrorDetails.userRole,
+        },
       };
 
       if (this.weatherPayload !== null) {
@@ -2077,7 +2077,7 @@ export class LayoutComponentComponent implements OnInit {
     let weatherCategoryList = [
       "weather",
       "24 Hour Weather Forecast",
-      "5 Day Weather Forecast"
+      "5 Day Weather Forecast",
     ];
     if (weatherCategoryList.indexOf(category) !== -1) {
       category = "weather";
@@ -2247,7 +2247,7 @@ export class LayoutComponentComponent implements OnInit {
     this.isKeyTrue$.subscribe(() => {
       setTimeout(() => {
         let userMirrorModel = {
-          id: this.userMirrorDetails.id
+          id: this.userMirrorDetails.id,
         };
 
         if (category == "clock") {
@@ -2255,13 +2255,13 @@ export class LayoutComponentComponent implements OnInit {
         }
 
         let mirrorPageModel = {
-          pageNumber: this.activeLayout + 1
+          pageNumber: this.activeLayout + 1,
         };
 
         let payload = {
           mirrorPageModel: mirrorPageModel,
           widgetSettingModel: {},
-          widgetCalendarList: {}
+          widgetCalendarList: {},
         };
 
         let widgetSetting = this._widgetUtil.getWidgetSetting(category);
@@ -2312,7 +2312,7 @@ export class LayoutComponentComponent implements OnInit {
         pageId: widgetSetting.mirrorPage.id,
         pageNumber: this.activeLayout + 1,
         previewStatus: false,
-        widgets: [data]
+        widgets: [data],
       };
       this.widgetSettings.push(customObject);
     }
@@ -2345,7 +2345,7 @@ export class LayoutComponentComponent implements OnInit {
       width: widgetSettingRequest.width,
       xPos: widgetSettingRequest.xPos,
       yPos: widgetSettingRequest.yPos,
-      displayName: widgetSettingRequest.widget.displayName
+      displayName: widgetSettingRequest.widget.displayName,
     };
     return data;
   }
@@ -2358,17 +2358,17 @@ export class LayoutComponentComponent implements OnInit {
         userMirror: {
           id: this.userMirrorDetails.id,
           user: {
-            id: user.id
+            id: user.id,
           },
           mirror: {
-            deviceId: this.userMirrorDetails.mirror.deviceId
+            deviceId: this.userMirrorDetails.mirror.deviceId,
           },
-          userRole: this.userMirrorDetails.userRole
-        }
+          userRole: this.userMirrorDetails.userRole,
+        },
       },
       isCurrentPageDeletionRequired:
         this.widgetSettings[this.activeLayout].widgets.length == 1,
-      pageNumber: this.activeLayout + 1
+      pageNumber: this.activeLayout + 1,
     };
 
     this._widgetService.deleteExistingWidget(payload).subscribe(

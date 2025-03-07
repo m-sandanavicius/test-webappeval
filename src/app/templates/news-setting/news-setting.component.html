@@ -102,7 +102,7 @@
                 >
                   CANCEL
                 </button>
-                <button class="btn btn-primary" type="button" (click)="save()">
+                <button class="btn btn-primary" (click)="saveNewsSettings()">
                   Save
                 </button>
               </div>
@@ -116,7 +116,7 @@
             <app-widget-bg-setting
               [widgetbgsetting]="widgetBgSetting"
               [widgetType]="widgetType"
-              (emitbgsettingNewsOptions)="save()"
+              (emitbgsettingNewsOptions)="onbgsettingNewsOptions($event)"
               (closeModalEvent)="dismissModel()"
             >
             </app-widget-bg-setting>

@@ -13,7 +13,7 @@ import { WidgetBgSettingComponent } from "../widget-bg-setting/widget-bg-setting
 @Component({
   selector: "app-count-down-widget",
   templateUrl: "./count-down-widget.component.html",
-  styleUrls: ["./count-down-widget.component.scss"]
+  styleUrls: ["./count-down-widget.component.scss"],
 })
 export class CountDownWidgetComponent implements OnInit, OnChanges {
   @ViewChild(WidgetBgSettingComponent, { static: false })
@@ -88,33 +88,33 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
     this.countDownFormGroup = this.formBuilder.group({
       eventName: [
         countDownWidget ? countDownWidget.eventName : "",
-        Validators.required
+        Validators.required,
       ],
       eventTime: [
         countDownWidget ? countDownWidget.eventTime : currentDateTime,
-        Validators.required
+        Validators.required,
       ],
       isDayEnabled: [
         countDownWidget ? countDownWidget.isDayEnabled : true,
-        Validators.requiredTrue
+        Validators.requiredTrue,
       ],
       isHourEnabled: [
         countDownWidget ? countDownWidget.isHourEnabled : true,
-        Validators.requiredTrue
+        Validators.requiredTrue,
       ],
       isMinuteEnabled: [
         countDownWidget ? countDownWidget.isMinuteEnabled : true,
-        Validators.requiredTrue
+        Validators.requiredTrue,
       ],
       isSecondEnabled: [
         countDownWidget ? countDownWidget.isSecondEnabled : true,
-        Validators.requiredTrue
-      ]
+        Validators.requiredTrue,
+      ],
     });
 
     this.widgetDataService.widgetFormState["count_down"].settings.initialValue =
       {
-        ...this.countDownFormGroup.value
+        ...this.countDownFormGroup.value,
       };
   }
 
@@ -157,7 +157,7 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
     const imageBgPayload = {
       userMirrorId: this.activeMirrorDetail.id,
       mastercategory: [this.countDownWidget.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(this.newBgSetting, imageBgPayload);
   }
@@ -165,7 +165,7 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
   saveCountDownSetting() {
     let payload = this.countDownFormGroup.value;
     payload["widgetSetting"] = {
-      id: this.countDownWidget.widgetSettingId
+      id: this.countDownWidget.widgetSettingId,
     };
     payload["id"] = this.countDownWidgetData.id;
 
@@ -207,7 +207,7 @@ export class CountDownWidgetComponent implements OnInit, OnChanges {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetail = this.storage.get("activeMirrorDetails");

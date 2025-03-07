@@ -15,7 +15,7 @@ import { ChoresWidgetFormatComponent } from "../chores-widget-format/chores-widg
 @Component({
   selector: "app-chores",
   templateUrl: "./chores.component.html",
-  styleUrls: ["./chores.component.scss"]
+  styleUrls: ["./chores.component.scss"],
 })
 export class ChoresComponent implements OnInit {
   @ViewChild(WidgetBgSettingComponent, { static: false })
@@ -67,13 +67,13 @@ export class ChoresComponent implements OnInit {
       let payload = {
         userMirrorModel: {
           mirror: {
-            id: this.choresTaskCredentials.mirrorDetails.mirror.id
+            id: this.choresTaskCredentials.mirrorDetails.mirror.id,
           },
-          userRole: this.choresTaskCredentials.mirrorDetails.userRole
+          userRole: this.choresTaskCredentials.mirrorDetails.userRole,
         },
         widgetSettingId: this.choresWidgetObject.widgetSettingId,
         authorizationCode: this.choresTaskCredentials.code,
-        type: "chores"
+        type: "chores",
       };
       this.updateTodoistCredential(payload);
     }
@@ -130,10 +130,10 @@ export class ChoresComponent implements OnInit {
 
     let payload = {
       userMirrorModel: {
-        id: this.activeMirrorDetails.id
+        id: this.activeMirrorDetails.id,
       },
       widgetSettingId: this.choresWidgetObject.widgetSettingId,
-      selectedTodoLabel: this.previouslyAddedProjects
+      selectedTodoLabel: this.previouslyAddedProjects,
     };
     this.loadingSpinner.show();
     this._todoService.updateSelectedLabels(payload).subscribe(
@@ -170,7 +170,7 @@ export class ChoresComponent implements OnInit {
       settingsForm.initialValue,
       {
         ...this.choresWidgetFormatComponent.todoFormatFormGroup.value,
-        ...this.choresWidgetFormatComponent.getChoresSettingsAdditionalProps()
+        ...this.choresWidgetFormatComponent.getChoresSettingsAdditionalProps(),
       }
     );
 
@@ -220,7 +220,7 @@ export class ChoresComponent implements OnInit {
     const calenderBgPayload = {
       userMirrorId: this.activeMirrorDetails.id,
       mastercategory: [this.choresWidgetObject.widgetMasterCategory],
-      widgetBackgroundSettingModel: this.newBgSetting
+      widgetBackgroundSettingModel: this.newBgSetting,
     };
     this.commonFunction.updateWidgetSettings(
       this.newBgSetting,
@@ -247,7 +247,7 @@ export class ChoresComponent implements OnInit {
         color: requestObject.color,
         todoAccountId: requestObject.todoAccountId,
         labelName: requestObject.labelName,
-        orderNumber: requestObject.orderNumber
+        orderNumber: requestObject.orderNumber,
       };
       this.previouslyAddedProjects.push(customData);
     }
@@ -317,7 +317,7 @@ export class ChoresComponent implements OnInit {
     let payload = {
       todoAccountDetailModel: accountDetails,
       widgetSettingId: this.choresWidgetObject.widgetSettingId,
-      type: "chores"
+      type: "chores",
     };
     this.loadingSpinner.show();
     this._todoService.getLatestTodoLabels(payload).subscribe(
@@ -385,7 +385,7 @@ export class ChoresComponent implements OnInit {
       this.widgetDataService.widgetFormState[
         this.category
       ].format.initialValue = {
-        ...this.widgetBgSetting
+        ...this.widgetBgSetting,
       };
     }
     this.activeMirrorDetails = this.storage.get("activeMirrorDetails");
@@ -442,7 +442,7 @@ export class ChoresComponent implements OnInit {
           accountType: "todoist",
           sourceAccount: res.object.todoAccountDetailModel.sourceAccount,
           labelList: res.object.selectedLabels,
-          projectList: res.object.selectedTodoProject
+          projectList: res.object.selectedTodoProject,
         };
 
         this.accountList.push(data);
